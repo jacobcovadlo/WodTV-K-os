@@ -131,7 +131,7 @@
       width:  min(100vw, calc(100vh * 16 / 9));
       height: min(100vh, calc(100vw * 9 / 16));
       display: flex; flex-direction: column;
-      padding: 1.5vh 2vw clamp(35px, 4vh, 52px);
+      padding: 1.5vh 0 clamp(35px, 4vh, 52px);
       position: relative; overflow: hidden; z-index: 1;
     }
 
@@ -165,14 +165,14 @@
     #wod-grid {
       display: grid;
       width: 100%;
-      gap: 4px 8px;
+      gap: 4px 0;   /* sin hueco entre columnas: franja continua */
       text-transform: uppercase;
       /* height y alignContent los controla el scaler */
     }
 
     /* Tarjeta de sección */
     .wod-card {
-      padding: 0.08em 0.5em 0.08em;
+      padding: 0.08em 0;
       min-width: 0;  /* evita que la columna se expanda con texto nowrap */
       min-height: 0; /* evita que la fila se expanda con el contenido */
       overflow: hidden;
@@ -193,9 +193,12 @@
       letter-spacing: 0.03em;
       white-space: normal;
       background: #00a5b2;
-      padding: 0.12em 0.3em 0.08em;
-      border-radius: 0.08em;
+      padding: 0.1em 0.35em 0.06em;
     }
+    /* Margen interior de las tarjetas (las franjas van de borde a borde) */
+    .wod-card > :not(.card-title) { padding-left: 0.5em; padding-right: 0.5em; }
+    .wod-card.col-first > *       { padding-left: 2vw; }
+    .wod-card.col-last  > *       { padding-right: 2vw; }
     .wod-line {
       font-size: 1em; font-weight: 500;
       color: #fff; line-height: 1.35;
@@ -411,6 +414,7 @@
       opacity: 0; pointer-events: none; transition: opacity 0.3s;
     }
     body.tv.show-controls #btn-back { opacity: 1; pointer-events: auto; }
+    body.tv.fs #btn-back { display: none; }
     body.tv #display-hint { display: none; }
 
   </style>
@@ -767,14 +771,30 @@
 
     /* ─── Detección de bloques ─── */
     // Regla única: línea en blanco = nueva columna
+    // Títulos de sección habituales: abren bloque nuevo aunque no haya
+    // línea en blanco antes (y una línea en blanco justo después no lo cierra).
+    const SECTION_RE = new RegExp('^(' + [
+      'WOD', 'METCON', 'STRENGTH', 'FUERZA', 'WARM[ -]?UP', 'CALENTAMIENTO',
+      'SKILLS?', 'T[ÉE]CNICA', 'ACCESSORY', 'ACCESSORIES', 'ACCESORIOS?',
+      'CORE', 'CASH[ -]?OUT', 'BUY[ -]?IN', 'GYMNASTICS', 'GIMN[ÁA]STICA',
+      'WEIGHTLIFTING', 'HALTEROFILIA', 'FINISHER', 'EXTRA', 'MOBILITY',
+      'MOVILIDAD', 'CONDITIONING', 'ENGINE', 'BENCHMARK',
+      '(?:PARTNER|TEAM|HERO|OPEN) WOD', 'PARTE? [A-Z0-9]'
+    ].join('|') + ')( ?\\d+)?\\s*:?$', 'i');
+
     function splitBlocks(raw) {
       const blocks = [];
       let cur = [];
       for (const ln of raw.split(/\r?\n/)) {
-        if (!ln.trim()) {
-          if (cur.length) { blocks.push(cur); cur = []; }
+        const t = ln.trim();
+        if (!t) {
+          const onlyTitle = cur.length === 1 && SECTION_RE.test(cur[0]);
+          if (cur.length && !onlyTitle) { blocks.push(cur); cur = []; }
+        } else if (SECTION_RE.test(t)) {
+          if (cur.length) blocks.push(cur);
+          cur = [t.replace(/\s*:$/, '')];
         } else {
-          cur.push(ln.trim());
+          cur.push(t);
         }
       }
       if (cur.length) blocks.push(cur);
@@ -823,26 +843,35 @@
       grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
       grid.style.gridTemplateRows    = `repeat(${rows}, 1fr)`;
       grid.innerHTML = blocks.map(b => renderCard(b)).join('');
+      grid.querySelectorAll('.wod-card').forEach((card, i) => {
+        if (i % cols === 0)        card.classList.add('col-first');
+        if (i % cols === cols - 1) card.classList.add('col-last');
+      });
     }
 
-    /* ─── Auto-escalado por columna ───
-       Cada columna escala de forma independiente: la columna con menos
-       contenido usa letras más grandes sin que la columna más cargada
-       la arrastre hacia abajo.
+    /* ─── Auto-escalado ───
+       Todas las tarjetas usan el mismo tamaño de letra: el mayor que
+       permite que quepa la más cargada. Solo las líneas sueltas que no
+       caben a lo ancho se encogen individualmente.
     ─── */
 
     // Encoge líneas que no caben en ancho de su tarjeta (una sola línea).
     // Devuelve true si se encogió alguna.
+    // Ancho que ocupa la línea en una sola fila (texto + su margen interior)
+    function naturalWidth(el) {
+      el.style.width = 'max-content'; el.style.whiteSpace = 'nowrap';
+      const w = el.scrollWidth;
+      el.style.width = ''; el.style.whiteSpace = '';
+      return w;
+    }
+
     function refineLongLines(cards) {
       let shrunken = false;
       Array.from(cards).forEach(card => {
-        const cardW = card.clientWidth - 4;
+        const cardW = card.clientWidth;
         card.querySelectorAll('.wod-line, .card-title').forEach(line => {
           line.style.fontSize = '';         // hereda de la tarjeta
-          line.style.whiteSpace = 'nowrap';
-          const naturalW = line.scrollWidth;
-          line.style.whiteSpace = '';
-          if (naturalW <= cardW) return;
+          if (naturalWidth(line) <= cardW) return;
 
           // getComputedStyle captura el tamaño real (incluyendo 1.4em de card-title)
           const hi0 = parseFloat(getComputedStyle(line).fontSize) || 16;
@@ -850,10 +879,7 @@
           while (hi - lo > 0.5) {
             const mid = (lo + hi) / 2;
             line.style.fontSize = mid + 'px';
-            line.style.whiteSpace = 'nowrap';
-            const fits = line.scrollWidth <= cardW;
-            line.style.whiteSpace = '';
-            if (fits) lo = mid; else hi = mid;
+            if (naturalWidth(line) <= cardW) lo = mid; else hi = mid;
           }
           line.style.fontSize = Math.floor(lo) + 'px';
           shrunken = true;
@@ -877,79 +903,47 @@
       grid.style.fontSize = '';
 
       grid.querySelectorAll('.wod-card').forEach(c => c.style.fontSize = '');
-      grid.querySelectorAll('.wod-line, .card-title').forEach(el => el.style.fontSize = '');
+      grid.querySelectorAll('.wod-line, .card-title').forEach(el => {
+        el.style.fontSize = ''; el.style.lineHeight = '';
+      });
 
       const cards = Array.from(grid.querySelectorAll('.wod-card'));
       if (!cards.length) return;
 
-      const colMatch = grid.style.gridTemplateColumns.match(/repeat\((\d+)/);
-      const numCols  = colMatch ? parseInt(colMatch[1]) : 1;
-      const colFontSizes = [];
-
-      // Paso 1: escalar cada columna de forma independiente
-      for (let col = 0; col < numCols; col++) {
-        const colCards = cards.filter((_, i) => i % numCols === col);
-
+      const fits = () => !cards.some(c =>
+        c.scrollHeight > c.clientHeight + 1 || c.scrollWidth > c.clientWidth + 1);
+      const search = () => {
         let lo = 4, hi = 500;
         while (hi - lo > 1) {
           const mid = (lo + hi) >> 1;
-          colCards.forEach(c => c.style.fontSize = mid + 'px');
-          const overflow = colCards.some(c =>
-            c.scrollHeight > c.clientHeight + 1 || c.scrollWidth > c.clientWidth + 1);
-          if (overflow) hi = mid; else lo = mid;
+          cards.forEach(c => c.style.fontSize = mid + 'px');
+          if (fits()) lo = mid; else hi = mid;
         }
-        colCards.forEach(c => c.style.fontSize = lo + 'px');
+        cards.forEach(c => c.style.fontSize = lo + 'px');
+        return lo;
+      };
 
-        if (refineLongLines(colCards)) {
-          hi = 500;
-          while (hi - lo > 1) {
-            const mid = (lo + hi) >> 1;
-            colCards.forEach(c => c.style.fontSize = mid + 'px');
-            const overflow = colCards.some(c =>
-              c.scrollHeight > c.clientHeight + 1 || c.scrollWidth > c.clientWidth + 1);
-            if (overflow) hi = mid; else lo = mid;
-          }
-          colCards.forEach(c => c.style.fontSize = lo + 'px');
-        }
+      let size = search();
+      if (refineLongLines(cards)) size = search();
 
-        colFontSizes.push(lo);
-      }
-
-      // Paso 2: limitar diferencia máxima entre columnas al 20%
-      const minFont    = Math.min(...colFontSizes);
-      const maxAllowed = Math.round(minFont * 1.2);
-
-      for (let col = 0; col < numCols; col++) {
-        if (colFontSizes[col] > maxAllowed) {
-          const colCards = cards.filter((_, i) => i % numCols === col);
-          colCards.forEach(c => {
-            c.querySelectorAll('.wod-line, .card-title').forEach(el => el.style.fontSize = '');
-            c.style.fontSize = maxAllowed + 'px';
-          });
-          refineLongLines(colCards);
-          colFontSizes[col] = maxAllowed;
-        }
-      }
-
-      // Paso 3: alinear todos los títulos al mismo tamaño
-      // Referencia: columna más pequeña × factor 1.4 (= card-title em normal)
-      const targetTitlePx = Math.round(Math.min(...colFontSizes) * 1.4);
+      // Títulos: mismo tamaño en todos y franja de la misma altura aunque
+      // alguno haya que encogerlo para que quepa.
+      const targetTitlePx = Math.round(size * 1.4);
       cards.forEach(card => {
         const title = card.querySelector('.card-title');
         if (!title) return;
-        title.style.whiteSpace = 'nowrap';
+        title.style.lineHeight = Math.round(targetTitlePx * 1.05) + 'px';
         title.style.fontSize   = targetTitlePx + 'px';
-        if (title.scrollWidth > card.clientWidth - 4) {
+        if (naturalWidth(title) > card.clientWidth) {
           // No cabe en una línea: bajar hasta que quepa
           let lo = 6, hi = targetTitlePx;
           while (hi - lo > 0.5) {
             const mid = (lo + hi) / 2;
             title.style.fontSize = mid + 'px';
-            if (title.scrollWidth <= card.clientWidth - 4) lo = mid; else hi = mid;
+            if (naturalWidth(title) <= card.clientWidth) lo = mid; else hi = mid;
           }
           title.style.fontSize = Math.floor(lo) + 'px';
         }
-        title.style.whiteSpace = '';
       });
     }
 
@@ -1155,6 +1149,7 @@
         screen.orientation.unlock();
       }
       const inFS = !!document.fullscreenElement;
+      document.body.classList.toggle('fs', inFS);
       const fsDisplay = document.getElementById('btn-fs-display');
       const fsTv = document.getElementById('btn-tv-fs');
       if (fsDisplay) fsDisplay.style.display = inFS ? 'none' : '';
