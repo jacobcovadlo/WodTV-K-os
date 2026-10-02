@@ -3,124 +3,198 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#1D1D1B">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>K-OS · WOD TV</title>
+  <title>K-OS WOD TV</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@500;600;700&family=Big+Shoulders+Display:wght@500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
+    /* ════════════════════════════════
+       TOKENS (sacados del logo de K-OS)
+    ════════════════════════════════ */
+    :root {
+      --teal:        #00A5B2;   /* acción principal, franjas, foco */
+      --teal-bright: #14BAC7;   /* hover del principal */
+      --teal-deep:   #00737C;   /* pulsado, bordes activos */
+      --ink:         #1D1D1B;   /* el negro del logo */
+      --graphite:    #2A2A28;   /* campos y superficies */
+      --chalk:       #F2F4F3;   /* texto sobre oscuro, fondo claro */
+      --mist:        #9AA4A3;   /* texto secundario sobre oscuro */
+      --line:        rgba(242, 244, 243, 0.14);
+      --line-strong: rgba(242, 244, 243, 0.28);
+      --danger:      #FF6B5B;
+      --amber:       #F5B841;
+
+      --font-display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
+      --font-ui:      'Barlow', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+      --r-sm: 8px; --r-md: 12px; --r-lg: 18px;
+      --cut: 0.75em;            /* corte inclinado del botón principal (ángulo de la K) */
+    }
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    [hidden] { display: none !important; }
 
     body {
-      background: #0a0a0a;
-      color: #fff;
-      font-family: 'Big Shoulders Display', 'Arial Black', Arial, sans-serif;
+      background: var(--ink);
+      color: var(--chalk);
+      font-family: var(--font-display);
       overflow: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* ════════════════════════════════
-       PANTALLA EDITOR
-    ════════════════════════════════ */
-    #screen-editor {
-      position: fixed; inset: 0;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 1.6rem; padding: 2rem;
-      z-index: 1;
-      background:
-        radial-gradient(ellipse at 20% 15%, rgba(0,165,178,0.10), transparent 55%),
-        radial-gradient(ellipse at 80% 90%, rgba(0,165,178,0.08), transparent 50%),
-        #fafafa;
-    }
-    #brand-logo {
-      height: clamp(90px, 15vh, 160px); width: auto;
-    }
-    #screen-editor p {
-      font-size: 1.15rem; color: #555;
-      font-family: Arial, sans-serif; text-align: center;
-      max-width: 700px; line-height: 1.5;
-    }
-    #wod-input {
-      width: min(64vw, 860px); aspect-ratio: 16 / 9;
-      background: #1a1a1a; color: #f0f0f0;
-      border: 2px solid #2a2a2a; border-radius: 8px;
-      font-size: 1.2rem; font-family: 'Courier New', monospace;
-      line-height: 1.6; padding: 1.2rem; resize: vertical;
-      outline: none; transition: border-color 0.2s;
-    }
-    #wod-input:focus { border-color: #555; }
-    #wod-input::placeholder { color: #333; }
-    .editor-btns { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
-    button {
-      padding: 1.1rem 2.4rem; font-size: 1.15rem; font-weight: 700;
-      font-family: 'Arial Black', Arial, sans-serif;
-      text-transform: uppercase; letter-spacing: 0.04em;
-      cursor: pointer; border: none; border-radius: 6px;
-      background: #111; color: #fff;
-      transition: transform 0.1s, filter 0.15s;
-    }
-    button:hover  { filter: brightness(1.3); }
-    button:active { transform: scale(0.97); }
-
-    /* Móvil: logo más grande relativo a la pantalla, botones compactos */
-    @media (max-width: 600px) {
-      #brand-logo { height: 120px; }
-      #screen-editor p { font-size: 0.95rem; max-width: 88vw; }
-      #wod-input { width: 88vw; }
-      .editor-btns { flex-direction: column; width: 88vw; gap: 0.6rem; }
-      button { font-size: 0.85rem; padding: 0.8rem 1rem; width: 100%; letter-spacing: 0.01em; }
-      #btn-back {
-        opacity: 1; color: #fff; background: rgba(255,255,255,0.28);
-        font-size: 1.2rem; padding: 0.75rem 1.5rem; bottom: 1.2rem; right: 1.2rem;
-        border-radius: 8px; font-weight: 700;
-      }
-      #display-hint { display: none; } /* "Esc volver" no aplica en móvil */
-    }
-
-    /* ════════════════════════════════
-       PANTALLA DISPLAY
-    ════════════════════════════════ */
-    #screen-display {
-      position: fixed; inset: 0;
-      display: none; align-items: center; justify-content: center;
-      background: #050a0b; overflow: hidden;
-      z-index: 2;
-    }
-
-    /* ── Fondo turquesa K-OS ── */
-    #display-bg {
-      position: absolute; inset: 0; z-index: 0; overflow: hidden;
-      pointer-events: none;
+    /* Fondo de marca compartido por la TV en espera y el WOD */
+    .kos-bg {
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
       background:
         radial-gradient(ellipse at 12% 18%, rgba(0,165,178,0.38), transparent 55%),
         radial-gradient(ellipse at 88% 85%, rgba(0,165,178,0.28), transparent 50%),
-        linear-gradient(135deg, #001b1e 0%, #050a0b 55%, #00262a 100%);
+        linear-gradient(135deg, #001b1e 0%, #070c0d 55%, #00262a 100%);
     }
 
+    /* Iconos (sprite SVG al inicio del body) */
+    .ico {
+      width: 1.15em; height: 1.15em; flex-shrink: 0;
+      fill: none; stroke: currentColor; stroke-width: 2;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
 
+    /* ════════════════════════════════
+       BOTONES: principal / secundario / ghost / cristal
+    ════════════════════════════════ */
+    .btn {
+      position: relative; isolation: isolate;
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.55em;
+      min-height: 48px; padding: 0 1.3em;
+      font: 600 1.0625rem/1 var(--font-ui); letter-spacing: 0.01em;
+      color: var(--chalk); background: transparent;
+      border: 1px solid transparent; border-radius: var(--r-md);
+      cursor: pointer; white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color .15s, border-color .15s, color .15s, transform .08s;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn:focus-visible { outline: 3px solid var(--teal); outline-offset: 4px; }
+    .btn[aria-busy="true"] { cursor: progress; opacity: .75; }
 
-    /* ── Esquina inferior derecha: logo + reloj ── */
+    /* Principal: el único con el corte inclinado del rayo de la K */
+    .btn--primary {
+      color: var(--ink); font-weight: 700;
+      padding: 0 calc(1.3em + var(--cut) / 2);
+      border: none; border-radius: 0;
+    }
+    .btn--primary::before {
+      content: ''; position: absolute; inset: 0; z-index: -1;
+      background: var(--teal);
+      clip-path: polygon(var(--cut) 0, 100% 0, calc(100% - var(--cut)) 100%, 0 100%);
+      transition: background-color .15s;
+    }
+    .btn--primary:active::before { background: var(--teal-deep); }
+    .btn--primary.is-sent::before { background: var(--chalk); }
+
+    .btn--secondary { border-color: var(--line-strong); }
+    .btn--ghost     { color: var(--mist); }
+
+    /* Cristal: controles flotantes sobre el WOD */
+    .btn--glass {
+      background: rgba(7, 12, 13, 0.72);
+      border-color: rgba(0, 165, 178, 0.55);
+      -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    }
+    .btn--icon  { padding: 0; width: 48px; }
+    .btn--block { width: 100%; }
+    .btn--lg    { min-height: 56px; font-size: 1.125rem; }
+
+    @media (hover: hover) {
+      .btn--primary:hover::before { background: var(--teal-bright); }
+      .btn--secondary:hover { background: rgba(242,244,243,.06); border-color: rgba(242,244,243,.45); }
+      .btn--ghost:hover     { color: var(--chalk); background: rgba(242,244,243,.06); }
+      .btn--glass:hover     { border-color: var(--teal); }
+    }
+
+    /* Variante clara (editor) */
+    .light .btn--secondary { color: var(--ink); border-color: rgba(29,29,27,.22); }
+    .light .btn--ghost     { color: #5B6564; }
+    @media (hover: hover) {
+      .light .btn--secondary:hover { background: rgba(29,29,27,.05); border-color: rgba(29,29,27,.45); }
+      .light .btn--ghost:hover     { color: var(--ink); background: rgba(29,29,27,.05); }
+    }
+
+    /* Campos de texto */
+    .field {
+      width: 100%;
+      background: var(--graphite); color: var(--chalk);
+      border: 1px solid var(--line); border-radius: var(--r-lg);
+      font: 500 1rem/1.55 var(--font-ui);   /* 16px: evita el zoom de iOS */
+      padding: 1rem 1.1rem; resize: none; outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .field::placeholder { color: rgba(242,244,243,.38); }
+    .field:focus { border-color: var(--teal); box-shadow: 0 0 0 4px rgba(0,165,178,.22); }
+    .field-label { font: 600 .9375rem var(--font-ui); color: var(--mist); }
+
+    /* ════════════════════════════════
+       PANTALLA EDITOR (#editor)
+    ════════════════════════════════ */
+    #screen-editor {
+      position: fixed; inset: 0; z-index: 1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1.5rem; padding: 2rem;
+      background:
+        radial-gradient(ellipse at 20% 15%, rgba(0,165,178,0.10), transparent 55%),
+        radial-gradient(ellipse at 80% 90%, rgba(0,165,178,0.08), transparent 50%),
+        var(--chalk);
+      color: var(--ink);
+    }
+    #brand-logo { height: clamp(90px, 14vh, 150px); width: auto; }
+    .editor-intro {
+      font: 500 1.125rem/1.5 var(--font-ui); color: #4A5352;
+      text-align: center; max-width: 34rem;
+    }
+    #wod-input {
+      width: min(64vw, 860px); min-height: clamp(220px, 40vh, 460px);
+      background: #fff; color: var(--ink);
+      border: 1px solid rgba(29,29,27,.14);
+      font: 500 1.0625rem/1.6 var(--font-ui);
+    }
+    #wod-input::placeholder { color: rgba(29,29,27,.4); }
+    .editor-btns { display: flex; gap: .75rem; flex-wrap: wrap; justify-content: center; }
+
+    @media (max-width: 600px) {
+      #screen-editor { justify-content: flex-start; padding: 1.5rem 1.25rem; gap: 1.1rem; overflow-y: auto; }
+      #brand-logo { height: 96px; }
+      .editor-intro { font-size: 1rem; }
+      #wod-input { width: 100%; }
+      .editor-btns { flex-direction: column; width: 100%; }
+      .editor-btns .btn { width: 100%; }
+    }
+
+    /* ════════════════════════════════
+       PANTALLA WOD (display)
+    ════════════════════════════════ */
+    #screen-display {
+      position: fixed; inset: 0; z-index: 2;
+      display: none; align-items: center; justify-content: center;
+      background: #070c0d; overflow: hidden;
+    }
+
+    /* Esquina inferior derecha: logo + reloj */
     #display-corner {
-      position: fixed; bottom: 1.5rem; right: 1.8rem;
-      display: flex; flex-direction: column; align-items: center;
-      gap: 0.6rem; z-index: 10; pointer-events: none;
+      position: fixed; bottom: 1.5rem; right: 1.8rem; z-index: 10;
+      display: flex; flex-direction: column; align-items: center; gap: .6rem;
+      pointer-events: none;
     }
-    #display-logo {
-      height: clamp(55px, 8vh, 110px); width: auto;
-      opacity: 0.95;
-    }
+    #display-logo { height: clamp(55px, 8vh, 110px); width: auto; opacity: .95; }
     #wod-clock {
-      background: rgba(0, 20, 23, 0.5);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(0, 165, 178, 0.55);
-      border-radius: 8px; padding: 0.2rem 0.7rem;
-      font-family: 'Orbitron', 'Courier New', monospace;
-      font-size: clamp(0.85rem, 1.5vw, 1.9rem);
-      font-weight: 700; color: #fff;
-      letter-spacing: 0.1em;
+      background: rgba(7, 12, 13, 0.6);
+      -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+      border: 1px solid rgba(0, 165, 178, 0.55); border-radius: var(--r-sm);
+      padding: .3em .65em;
+      font: 600 clamp(.95rem, 1.6vw, 2rem)/1 var(--font-ui);
+      font-variant-numeric: tabular-nums; letter-spacing: .04em; color: #fff;
     }
 
     /* Marco con la proporción real de un TV (16:9), centrado y
@@ -136,358 +210,389 @@
     }
 
     /* Cabecera fija — tamaños en vw, no escala con el scaler */
-    #wod-header {
-      flex-shrink: 0;
-      text-align: center;
-      padding-bottom: 0.5vh;
-    }
-    #wod-header .title {
-      font-size: clamp(20px, 4.5vw, 90px);
-      font-weight: 900; color: #fff;
-      text-transform: uppercase; letter-spacing: 0.02em; line-height: 1.1;
-    }
-    #wod-header .subtitle {
-      font-size: clamp(14px, 2.7vw, 54px);
-      font-weight: 400; color: rgba(255,255,255,0.6); line-height: 1.15;
-      letter-spacing: 0.06em; text-transform: uppercase;
-    }
+    #wod-header { flex-shrink: 0; text-align: center; padding-bottom: .5vh; }
 
     /* Wrapper del grid — ocupa el espacio restante (flex:1) */
-    #wod-content {
-      flex: 1;
-      min-height: 0;
-      width: 100%;
-      overflow: hidden;
-      position: relative;
-    }
+    #wod-content { flex: 1; min-height: 0; width: 100%; overflow: hidden; position: relative; }
 
     /* Grid de secciones — SIN flex:1 para que scrollHeight refleje el tamaño real */
     #wod-grid {
-      display: grid;
-      width: 100%;
-      gap: 4px 0;   /* sin hueco entre columnas: franja continua */
+      display: grid; width: 100%;
+      gap: 1.2vh 0;   /* sin hueco entre columnas: franja continua */
       text-transform: uppercase;
       /* height y alignContent los controla el scaler */
     }
 
     /* Tarjeta de sección */
     .wod-card {
-      padding: 0.08em 0;
+      padding: .08em 0;
       min-width: 0;  /* evita que la columna se expanda con texto nowrap */
       min-height: 0; /* evita que la fila se expanda con el contenido */
       overflow: hidden;
       display: flex; flex-direction: column; justify-content: flex-start;
     }
     .card-num {
-      font-size: 0.85em; font-weight: 400;
-      color: rgba(255,255,255,0.35);
-      line-height: 1.1; margin-bottom: 0.08em;
-      letter-spacing: 0.05em;
-      white-space: normal;
+      font-size: .85em; font-weight: 500;
+      color: rgba(255,255,255,.65);
+      line-height: 1.1; margin-bottom: .08em; letter-spacing: .05em;
     }
     /* Franja de color bajo el título de cada bloque (como en la pizarra de K-OS) */
     .card-title {
-      font-size: 1.4em; font-weight: 900;
-      color: #fff;
-      line-height: 1.05; margin-bottom: 0.3em;
-      letter-spacing: 0.03em;
-      white-space: normal;
-      background: #00a5b2;
-      padding: 0.1em 0.35em 0.06em;
+      font-size: 1.4em; font-weight: 900; color: #fff;
+      line-height: 1.05; margin-bottom: .3em; letter-spacing: .03em;
+      background: var(--teal);
+      padding-top: .1em; padding-bottom: .06em;
     }
-    /* Margen interior de las tarjetas (las franjas van de borde a borde) */
-    .wod-card > :not(.card-title) { padding-left: 0.5em; padding-right: 0.5em; }
-    .wod-card.col-first > *       { padding-left: 2vw; }
-    .wod-card.col-last  > *       { padding-right: 2vw; }
+    /* Margen interior en vw (no en em): el borde izquierdo queda recto aunque
+       alguna línea se encoja, y las franjas siguen yendo de borde a borde */
+    .wod-card > *            { padding-inline: 1.2vw; }
+    .wod-card.col-first > *  { padding-left: 2.4vw; }
+    .wod-card.col-last  > *  { padding-right: 2.4vw; }
     .wod-line {
-      font-size: 1em; font-weight: 500;
-      color: #fff; line-height: 1.35;
-      letter-spacing: 0.03em;
-      white-space: normal;
+      font-size: 1em; font-weight: 600; color: #fff;
+      line-height: 1.35; letter-spacing: .03em;
     }
     .wod-note {
-      font-size: 0.88em; font-style: italic;
-      color: rgba(255,255,255,0.45); line-height: 1.15;
-      white-space: normal;
+      font-size: .88em; font-weight: 500;
+      color: rgba(255,255,255,.7); line-height: 1.15;
     }
-    strong { color: #fff; font-weight: 900; }
-    #wod-grid strong { font-size: 1.1em; font-weight: 900; }
+    #wod-grid strong { font-weight: 900; color: #fff; }
 
-    /* Botón volver */
-    #btn-back {
-      position: fixed; bottom: 0.5rem; right: 0.7rem;
-      background: rgba(255,255,255,0.06); color: #444;
-      font-size: 0.65rem; padding: 0.25rem 0.6rem;
-      border-radius: 3px; opacity: 0.3; transition: opacity 0.2s;
-      text-transform: none; letter-spacing: 0;
-      font-family: Arial, sans-serif; font-weight: 400; z-index: 20;
+    /* Controles flotantes: aparecen al mover el ratón, tocar o pulsar
+       una tecla, y se ocultan solos a los 5 s para no tapar el WOD */
+    #display-controls {
+      position: fixed; left: 1.8rem; bottom: 1.5rem; z-index: 20;
+      display: flex; gap: .6rem;
+      opacity: 0; pointer-events: none; transition: opacity .3s;
     }
-    #btn-back:hover { opacity: 1; color: #ccc; }
+    body.show-controls #display-controls { opacity: 1; pointer-events: auto; }
+    #display-controls .btn { font-size: clamp(1rem, 1.5vw, 1.6rem); min-height: clamp(48px, 5.5vh, 72px); }
+    #display-controls .btn--icon { width: clamp(48px, 5.5vh, 72px); }
+    body.fs #btn-fs-display     { display: none; }
+    body.tv.fs #btn-back        { display: none; }
 
-    #btn-fs-display {
-      position: fixed; top: 1rem; right: 1rem;
-      background: rgba(255,255,255,0.18); color: #fff;
-      font-size: 1.1rem; padding: 0.6rem 1.2rem;
-      border-radius: 8px; font-weight: 700;
-      font-family: Arial, sans-serif; z-index: 20;
-      text-transform: none; letter-spacing: 0;
+    /* ════════════════════════════════
+       TV EN ESPERA (QR)
+    ════════════════════════════════ */
+    #screen-tv-wait {
+      display: none; position: fixed; inset: 0; z-index: 5;
+      align-items: center; justify-content: center;
+      background: #070c0d; overflow: hidden;
     }
-    #btn-fs-display:hover { background: rgba(255,255,255,0.32); }
+    .wait-layout {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center; gap: 7vw;
+      width: min(88vw, 150vh);
+    }
+    #tv-logo { height: clamp(90px, 15vh, 220px); width: auto; display: block; margin-bottom: 4.5vh; }
+    .wait-title {
+      font: 800 clamp(2rem, 6.2vh, 5.5rem)/1 var(--font-display);
+      color: #fff; letter-spacing: .01em; margin-bottom: 3.5vh;
+    }
+    .wait-steps { list-style: none; display: grid; gap: 1.6vh; margin-bottom: 5vh; }
+    .wait-steps li {
+      display: flex; align-items: center; gap: .8em;
+      font: 500 clamp(1.05rem, 2.6vh, 2.2rem)/1.2 var(--font-ui); color: #D5DCDB;
+    }
+    .step-n {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 1.7em; height: 1.7em; flex-shrink: 0;
+      font: 800 .9em/1 var(--font-display); color: var(--ink);
+      background: var(--teal);
+      clip-path: polygon(22% 0, 100% 0, 78% 100%, 0 100%);
+    }
+    .live {
+      display: flex; align-items: center; gap: .6em;
+      font: 500 clamp(.95rem, 2vh, 1.7rem) var(--font-ui); color: var(--mist);
+    }
+    .live-dot {
+      width: .6em; height: .6em; border-radius: 50%; background: var(--teal);
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+    .live.is-warning .live-dot { background: var(--amber); }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
 
-    @media (max-width: 600px) {
-      #btn-back {
-        opacity: 1; color: #fff; font-weight: 700;
-        font-size: 1.2rem; padding: 0.75rem 1.5rem;
-        bottom: 1.2rem; right: 1.2rem;
-        background: rgba(255,255,255,0.22); border-radius: 8px;
-        width: auto;
-      }
+    .qr-card {
+      background: #fff; border-radius: var(--r-lg);
+      padding: clamp(14px, 2.2vh, 30px);
+      box-shadow: 0 0 0 1px rgba(0,165,178,.45), 0 24px 70px rgba(0,165,178,.22);
+    }
+    #tv-qr { display: block; width: clamp(220px, 46vh, 520px); aspect-ratio: 1; }
+    #qr-error {
+      width: clamp(220px, 46vh, 520px); aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center; text-align: center;
+      font: 600 clamp(1rem, 2.2vh, 1.6rem)/1.4 var(--font-ui); color: var(--ink); padding: 1.5em;
     }
 
-    #display-hint {
-      display: none !important;
-      position: fixed; bottom: 0.5rem; left: 0.7rem;
-      color: #1c1c1c; font-size: 0.6rem;
-      font-family: Arial, sans-serif; pointer-events: none;
+    .tv-controls {
+      position: absolute; left: 50%; bottom: 3vh; z-index: 2; transform: translateX(-50%);
+      display: flex; gap: .75rem;
+      opacity: 0; pointer-events: none; transition: opacity .3s;
+    }
+    body.show-controls .tv-controls { opacity: 1; pointer-events: auto; }
+    .tv-controls .btn { font-size: clamp(1rem, 1.9vh, 1.5rem); min-height: clamp(48px, 5.5vh, 72px); }
+    body.fs #btn-tv-fs { display: none; }
+
+    /* TV en vertical o pantallas estrechas: una sola columna */
+    @media (max-aspect-ratio: 1/1) {
+      .wait-layout { grid-template-columns: 1fr; justify-items: center; text-align: center; gap: 4vh; }
+      #tv-logo { margin-inline: auto; margin-bottom: 3vh; }
+      .wait-steps { justify-content: center; margin-bottom: 3vh; }
+      .live { justify-content: center; }
+      #tv-qr, #qr-error { width: min(70vw, 42vh); }
+      .wait-title { font-size: clamp(2rem, 5vh, 4rem); }
     }
 
-    /* ════ Botones secundarios del editor ════ */
-    #btn-share { display: none; } /* solo visible en HTTP */
-
-    /* ════ Modal Chromecast ════ */
-    #cast-modal {
+    /* ════════════════════════════════
+       DIÁLOGOS (nuevo QR, Chromecast)
+    ════════════════════════════════ */
+    .dialog {
       position: fixed; inset: 0; z-index: 200;
-      background: rgba(0,0,0,0.88);
-      display: none; align-items: center; justify-content: center;
+      display: none; align-items: center; justify-content: center; padding: 1.25rem;
+      background: rgba(4, 7, 8, 0.72);
+      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
     }
-    #cast-panel {
-      background: #111; border: 1px solid #2a2a2a;
-      border-radius: 10px; padding: 2rem 2.2rem 1.6rem;
-      max-width: 400px; width: 92%; text-align: center;
+    .dialog.is-open { display: flex; }
+    .dialog-panel {
+      width: min(30rem, 100%); max-height: calc(100vh - 2.5rem); overflow-y: auto;
+      background: #151919; border: 1px solid var(--line); border-radius: var(--r-lg);
+      padding: 1.75rem; box-shadow: 0 30px 80px rgba(0,0,0,.55);
+      font-family: var(--font-ui);
+      animation: dialog-in .18s ease-out;
     }
-    .cast-title {
-      font-size: 0.95rem; font-weight: 900; color: #fff;
-      text-transform: uppercase; letter-spacing: 0.08em;
-      margin-bottom: 1.4rem;
-    }
-    .cast-steps { text-align: left; margin-bottom: 1.4rem; }
-    .cast-step {
-      display: flex; gap: 0.8rem; align-items: flex-start;
-      margin-bottom: 0.9rem;
-    }
+    @keyframes dialog-in { from { opacity: 0; transform: translateY(8px); } }
+    .dialog-title { font: 800 1.75rem/1.1 var(--font-display); color: #fff; margin-bottom: .6rem; }
+    .dialog-text  { font: 500 1rem/1.5 var(--font-ui); color: #C5CDCC; margin-bottom: 1.5rem; }
+    .dialog-actions { display: flex; gap: .75rem; justify-content: flex-end; flex-wrap: wrap; }
+    #renew-dialog .dialog-panel { width: min(34rem, 100%); }
+    #renew-dialog .dialog-title { font-size: clamp(1.75rem, 3.6vh, 2.6rem); }
+    #renew-dialog .dialog-text  { font-size: clamp(1rem, 2vh, 1.4rem); }
+    #renew-dialog .btn          { font-size: clamp(1rem, 1.9vh, 1.4rem); min-height: clamp(48px, 5.5vh, 68px); }
+
+    .cast-steps { display: grid; gap: .9rem; margin-bottom: 1.25rem; }
+    .cast-step  { display: flex; gap: .8rem; align-items: flex-start; }
     .cast-n {
-      background: #fff; color: #000; border-radius: 50%;
-      min-width: 1.35rem; height: 1.35rem;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.65rem; font-weight: 900; flex-shrink: 0;
-      margin-top: 0.1rem;
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 1.6rem; height: 1.6rem; flex-shrink: 0; margin-top: .05rem;
+      font: 800 .9rem/1 var(--font-display); color: var(--ink); background: var(--teal);
+      clip-path: polygon(22% 0, 100% 0, 78% 100%, 0 100%);
     }
-    .cast-text {
-      font-size: 0.82rem; color: #999;
-      font-family: Arial, sans-serif; line-height: 1.55;
-    }
-    .cast-text strong { color: #fff; font-family: 'Arial Black', Arial, sans-serif; }
+    .cast-text { font: 500 .9375rem/1.55 var(--font-ui); color: #C5CDCC; }
+    .cast-text strong { color: #fff; font-weight: 700; }
     .cast-text code {
-      background: #1e1e1e; border: 1px solid #333;
-      border-radius: 3px; padding: 0.05em 0.35em;
-      font-family: monospace; font-size: 0.9em; color: #ccc;
+      background: var(--graphite); border: 1px solid var(--line); border-radius: 4px;
+      padding: .05em .35em; font: 500 .875em ui-monospace, monospace; color: var(--chalk);
     }
     .cast-note {
-      font-size: 0.72rem; color: #666; font-family: Arial, sans-serif;
-      line-height: 1.5; text-align: left; margin-bottom: 1.4rem;
-      border-top: 1px solid #2a2a2a; padding-top: 0.9rem;
+      font: 500 .875rem/1.5 var(--font-ui); color: var(--mist);
+      border-top: 1px solid var(--line); padding-top: 1rem; margin-bottom: 1.25rem;
     }
+    .cast-note:empty { display: none; }
     .cast-share-box {
-      background: rgba(255,255,255,0.07); border-radius: 10px;
-      padding: 1rem 1rem 0.8rem; margin-bottom: 1.2rem; text-align: center;
+      background: rgba(242,244,243,.05); border: 1px solid var(--line);
+      border-radius: var(--r-md); padding: 1rem; margin-bottom: .5rem;
     }
-    .cast-share-label {
-      font-size: 0.7rem; color: #888; font-family: Arial, sans-serif;
-      letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.7rem;
-    }
-    .cast-share-sub {
-      font-size: 0.7rem; color: #666; font-family: Arial, sans-serif;
-      line-height: 1.45; margin-top: 0.6rem;
-    }
-    #btn-share-wod {
-      width: 100%; background: #fff; color: #000;
-      font-size: 0.95rem; padding: 0.65rem 1rem;
-      border-radius: 8px; border: none; cursor: pointer;
-      font-weight: 900; letter-spacing: 0.02em;
-      font-family: 'Arial Black', Arial, sans-serif;
-    }
-    #btn-cast-close {
-      background: #1a1a1a; color: #666; border: 1px solid #2a2a2a;
-      font-size: 0.8rem; padding: 0.55rem 1.4rem;
-    }
-    #btn-cast-close:hover { color: #ccc; }
+    .cast-share-label { font: 700 1rem var(--font-ui); color: #fff; margin-bottom: .75rem; }
+    .cast-share-sub   { font: 500 .875rem/1.45 var(--font-ui); color: var(--mist); margin-top: .75rem; }
 
-    /* ════ Pantalla de espera TV ════ */
-    #screen-tv-wait {
-      display: none; position: fixed; inset: 0;
-      background: #000; flex-direction: column;
-      align-items: center; justify-content: center; z-index: 5; gap: 1.2rem;
-    }
-    #tv-logo { height: 170px; opacity: 0.92; }
-    #tv-qr { width: 230px; height: 230px; border-radius: 6px; }
-    #tv-wait-label {
-      color: #888; font-family: 'Arial Black', Arial, sans-serif;
-      font-size: 0.95rem; letter-spacing: 0.15em; text-transform: uppercase;
-    }
-    #tv-wait-sub {
-      color: #2a2a2a; font-family: Arial, sans-serif;
-      font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
-    }
-    #tv-wait-btns { display: flex; gap: 0.6rem; margin-top: 0.6rem; }
-    #btn-tv-fs, #btn-tv-renew {
-      background: #1a1a1a; color: #555;
-      border: 1px solid #2a2a2a; border-radius: 8px;
-      font-size: 0.9rem; padding: 0.6rem 1.4rem; cursor: pointer;
-      font-family: Arial, sans-serif;
-    }
-    #btn-tv-fs:hover, #btn-tv-renew:hover { color: #ccc; border-color: #555; }
-
-    /* ════ Pantalla enviar WOD (móvil tras escanear) ════ */
+    /* ════════════════════════════════
+       MÓVIL: ENVIAR WOD (#send=CÓDIGO)
+    ════════════════════════════════ */
     #screen-send {
-      display: none; position: fixed; inset: 0;
-      background: #111; flex-direction: column;
-      align-items: center; padding: 2rem 1.5rem; box-sizing: border-box; z-index: 10;
+      display: none; position: fixed; inset: 0; z-index: 10;
+      flex-direction: column; gap: 1rem;
+      padding: max(1rem, env(safe-area-inset-top)) 1.25rem max(1.25rem, env(safe-area-inset-bottom));
+      background:
+        radial-gradient(ellipse at 10% 0%, rgba(0,165,178,0.18), transparent 55%),
+        var(--ink);
+      font-family: var(--font-ui);
     }
-    #send-logo { height: 90px; margin-bottom: 1.2rem; }
-    #send-input {
-      width: 100%; flex: 1; background: #1a1a1a; color: #fff;
-      border: 1px solid #333; border-radius: 10px; padding: 1rem;
-      font-size: 1rem; resize: none; margin-bottom: 1rem;
-      font-family: Arial, sans-serif; box-sizing: border-box;
-    }
-    #btn-send-wod {
-      width: 100%; background: #fff; color: #000;
-      font-size: 1.1rem; font-weight: 900; padding: 1rem;
-      border: none; border-radius: 10px; cursor: pointer;
-      font-family: 'Arial Black', Arial, sans-serif; letter-spacing: 0.04em;
-    }
+    .send-top { display: flex; align-items: center; justify-content: space-between; }
+    .send-top .btn { margin-left: -.6em; color: var(--teal); }
+    #send-logo { height: 44px; width: auto; }
+    #send-form { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: .6rem; }
+    #send-input { flex: 1; min-height: 160px; }
+    #btn-send-wod { margin-top: .4rem; }
     #send-status {
-      margin-top: 0.8rem; color: #666; font-family: Arial, sans-serif;
-      font-size: 0.85rem; text-align: center; min-height: 1.2em;
+      min-height: 1.4em; text-align: center;
+      font: 500 .9375rem/1.4 var(--font-ui); color: var(--mist);
     }
-    #send-status.error { color: #ff6b6b; font-size: 0.95rem; }
-    #btn-scan {
-      align-self: flex-start; margin-bottom: 0.6rem;
-      background: transparent; color: #00a5b2; border: 1px solid rgba(0,165,178,0.5);
-      border-radius: 8px; padding: 0.55rem 0.9rem; font-size: 0.85rem;
-      font-family: Arial, sans-serif; font-weight: 700; text-transform: none; letter-spacing: 0;
-    }
-    #btn-scan.big {
-      align-self: stretch; background: #00a5b2; color: #fff; border: none;
-      font-size: 1.05rem; padding: 1rem; margin: 0.8rem 0 0;
-      order: 10;  /* abajo, donde estaba "Enviar" */
-    }
+    #send-status.ok    { color: var(--teal); }
+    #send-status.error { color: var(--danger); }
 
-    /* ════ Escáner QR (móvil) ════ */
+    #send-empty {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center; gap: .75rem;
+    }
+    .empty-icon { width: 76px; height: 76px; color: var(--teal); margin-bottom: .5rem; }
+    .empty-icon .ico { width: 100%; height: 100%; stroke-width: 1.5; }
+    .empty-title { font: 800 2rem/1.05 var(--font-display); color: #fff; }
+    .empty-text  { font: 500 1rem/1.5 var(--font-ui); color: #C5CDCC; max-width: 20rem; margin-bottom: 1rem; }
+
+    /* ════════════════════════════════
+       ESCÁNER QR (móvil)
+    ════════════════════════════════ */
     #scan-overlay {
       display: none; position: fixed; inset: 0; z-index: 40;
-      background: #000; flex-direction: column;
-      align-items: center; justify-content: center; gap: 1rem; padding: 1.5rem;
+      flex-direction: column; align-items: center; justify-content: center; gap: 1.25rem;
+      padding: max(1.5rem, env(safe-area-inset-top)) 1.25rem max(1.5rem, env(safe-area-inset-bottom));
+      background: #000; font-family: var(--font-ui);
     }
-    #scan-video {
-      width: 100%; max-width: 480px; aspect-ratio: 1; object-fit: cover;
-      border-radius: 14px; border: 3px solid #00a5b2; background: #111;
+    .scan-frame {
+      position: relative; width: min(100%, 420px); aspect-ratio: 1;
+      border-radius: var(--r-lg); overflow: hidden; background: #111;
     }
-    #scan-msg {
-      color: #ccc; font-family: Arial, sans-serif; font-size: 0.95rem;
-      text-align: center; max-width: 480px;
+    #scan-video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    /* Visor: cuatro esquinas turquesa */
+    .scan-corners {
+      position: absolute; inset: 14%; pointer-events: none;
+      --c: var(--teal); --l: 34px; --w: 4px;
+      background:
+        linear-gradient(var(--c),var(--c)) top    left  / var(--l) var(--w) no-repeat,
+        linear-gradient(var(--c),var(--c)) top    left  / var(--w) var(--l) no-repeat,
+        linear-gradient(var(--c),var(--c)) top    right / var(--l) var(--w) no-repeat,
+        linear-gradient(var(--c),var(--c)) top    right / var(--w) var(--l) no-repeat,
+        linear-gradient(var(--c),var(--c)) bottom left  / var(--l) var(--w) no-repeat,
+        linear-gradient(var(--c),var(--c)) bottom left  / var(--w) var(--l) no-repeat,
+        linear-gradient(var(--c),var(--c)) bottom right / var(--l) var(--w) no-repeat,
+        linear-gradient(var(--c),var(--c)) bottom right / var(--w) var(--l) no-repeat;
     }
-    #btn-scan-cancel {
-      background: #1a1a1a; color: #fff; border: 1px solid #333;
-      border-radius: 10px; font-size: 0.95rem; padding: 0.8rem 2rem;
-    }
+    #scan-overlay.no-camera .scan-frame { display: none; }
+    #scan-msg { font: 500 1rem/1.5 var(--font-ui); color: #D5DCDB; text-align: center; max-width: 420px; }
+    #btn-scan-cancel { width: min(100%, 420px); }
 
-    /* ════ TV: botón "Volver al QR" ════
-       Aparece al mover el ratón, tocar o pulsar una tecla, y se
-       oculta solo a los 5 s para no tapar el WOD. */
-    body.tv #btn-back {
-      top: auto; bottom: 1.5rem; left: 1.8rem; right: auto; width: auto;
-      background: rgba(0, 20, 23, 0.75); color: #fff;
-      border: 1px solid rgba(0, 165, 178, 0.7); border-radius: 10px;
-      font-family: Arial, sans-serif; font-weight: 700;
-      font-size: clamp(1rem, 1.8vw, 1.8rem); padding: 0.7em 1.3em;
-      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
     }
-    body.tv.show-controls #btn-back { opacity: 1; pointer-events: auto; }
-    body.tv.fs #btn-back { display: none; }
-    body.tv #display-hint { display: none; }
-
   </style>
 </head>
 <body>
 
-  <!-- Pantalla 1: Editor -->
-  <div id="screen-editor" style="display:none">
+  <!-- Iconos (trazos basados en Lucide, licencia ISC) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-tv" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="m17 2-5 5-5-5"/></symbol>
+    <symbol id="i-maximize" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-2.64-6.36L21 8"/><path d="M21 3v5h-5"/></symbol>
+    <symbol id="i-scan" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10"/></symbol>
+    <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-cast" viewBox="0 0 24 24"><path d="M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6M2 12a9 9 0 0 1 8 8M2 16a5 5 0 0 1 4 4M2 20h.01"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></symbol>
+  </svg>
+
+  <!-- Editor (#editor) -->
+  <div id="screen-editor" class="light" style="display:none">
     <img id="brand-logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4bWxuczppbmtzY2FwZT0iaHR0cDovL3d3dy5pbmtzY2FwZS5vcmcvbmFtZXNwYWNlcy9pbmtzY2FwZSIgdmVyc2lvbj0iMS4xIiB3aWR0aD0iMTI3LjA3MTA3OSIgaGVpZ2h0PSIxNTAuMzE5MyIgdmlld0JveD0iMCAwIDEyNy4wNzEwNzkgMTUwLjMxOTMiPg0KPGRlZnM+DQo8Y2xpcFBhdGggaWQ9ImNsaXBfMSI+DQo8cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSwtMzU0Ljk3NjYzLDIxNy40ODU1KSIgZD0iTTM1NC45NzY2IDY3LjE2NjJINDgyLjA0NzY4VjIxNy40ODU1SDM1NC45NzY2WiIvPg0KPC9jbGlwUGF0aD4NCjxjbGlwUGF0aCBpZD0iY2xpcF8yIj4NCjxwYXRoIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLC0zNTQuOTc2NjMsMjE3LjQ4NTUpIiBkPSJNMCAwSDU5NS4yNzZWNTk1LjI3NkgwWiIvPg0KPC9jbGlwUGF0aD4NCjxjbGlwUGF0aCBpZD0iY2xpcF8zIj4NCjxwYXRoIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLC0zNTQuOTc2NjMsMjE3LjQ4NTUpIiBkPSJNMCA1OTUuMjc2SDU5NS4yNzZWMEgwWiIvPg0KPC9jbGlwUGF0aD4NCjxjbGlwUGF0aCBpZD0iY2xpcF80Ij4NCjxwYXRoIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLC0zNTQuOTc2NjMsMjE3LjQ4NTUpIiBkPSJNMCA1OTUuMjc2SDU5NS4yNzZWMEgwWiIvPg0KPC9jbGlwUGF0aD4NCjxjbGlwUGF0aCBpZD0iY2xpcF81Ij4NCjxwYXRoIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLC0zNTQuOTc2NjMsMjE3LjQ4NTUpIiBkPSJNMCA1OTUuMjc2SDU5NS4yNzZWMEgwWiIvPg0KPC9jbGlwUGF0aD4NCjxjbGlwUGF0aCBpZD0iY2xpcF82Ij4NCjxwYXRoIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLC0zNTQuOTc2NjMsMjE3LjQ4NTUpIiBkPSJNMCA1OTUuMjc2SDU5NS4yNzZWMEgwWiIvPg0KPC9jbGlwUGF0aD4NCjxjbGlwUGF0aCBpZD0iY2xpcF83Ij4NCjxwYXRoIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLC0zNTQuOTc2NjMsMjE3LjQ4NTUpIiBkPSJNMCA1OTUuMjc2SDU5NS4yNzZWMEgwWiIvPg0KPC9jbGlwUGF0aD4NCjxjbGlwUGF0aCBpZD0iY2xpcF84Ij4NCjxwYXRoIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLC0zNTQuOTc2NjMsMjE3LjQ4NTUpIiBkPSJNMCA1OTUuMjc2SDU5NS4yNzZWMEgwWiIvPg0KPC9jbGlwUGF0aD4NCjwvZGVmcz4NCjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwXzEpIj4NCjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwXzIpIj4NCjxnIGlua3NjYXBlOmdyb3VwbW9kZT0ibGF5ZXIiIGlua3NjYXBlOmxhYmVsPSJDYXBhIDEiPg0KPHBhdGggdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsLTM1NC45NzY2MywyMTcuNDg1NSkiIGQ9Ik0wIDI5Mi4wNjlINTk1LjI3NVY1OTUuMjc1SDBaIiBmaWxsPSIjMWQxZDFiIi8+DQo8cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSwtLjAwMDAzMDUxNzU3OSwtMTY5LjYwMjYpIiBkPSJNMCAwSDMyLjUxM0w0NC4zMTMgMzkuMDY4IDM1LjM5NyAzOS4xMzYgNTguNzMzIDYwLjU2OSA2NC43NjUgMzkuMDY4SDczLjk0MUw4NS40NzkgMEgxMTcuNDY4TDEwNi4xOTIgMzkuMDY4SDk3LjU0TDg0LjY5MSA4Mi44NTYgOTQuNjU2IDkxLjc3MUg4OC42MjVMMTI2LjY0NSAxMjguNjY1SDk1LjE4TDU4LjIwOSA5MS43NzFINjMuNjA3TDQ1LjYyNCA3NC45OSA1MC44NjggOTEuNzcxSDQxLjY5TDU1LjMyNSAxMjguNjY1SDIzLjg2TDExLjI3NCA5MS43NzFIMTguODc5TDMuMTQ2IDM5LjA2OEgxMS4yNzRaIiBmaWxsPSIjMDBhNWIyIi8+DQo8cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSwyMy44NjEyNjgsLTI5OC4yNjc2KSIgZD0iTTAgMC0xMi41ODgtMzYuODk0SC00Ljk4MkwtMTcuMzEzLTc4LjIwMSAyNi40NDItMzYuODk0SDE3LjgyOUwzMS40NjQgMFoiIGZpbGw9IiNmZmZmZmYiLz4NCjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwXzMpIj4NCjxwYXRoIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLDQzLjM5MzQ2NSwtMTQ3Ljk0OTMxKSIgZD0iTTAgMEMyLjk3MiAwIDQuNTEyIDEuMjAxIDUuMjUyIDQuMTcyTDUuNDMgNC44ODRINC4wMDZMMy44MjggNC4xNzJDMy4yOCAxLjk3NCAyLjQyMSAxLjMwMiAuMzI1IDEuMzAyLTEuODEyIDEuMzAyLTIuMzE1IDEuOTc0LTEuNzY4IDQuMTcyTC0uMTY0IDEwLjYwMkMuMzc5IDEyLjc4IDEuMjIyIDEzLjQ3MiAzLjMxOCAxMy40NzIgNS4zOTUgMTMuNDcyIDUuOTE0IDEyLjc4IDUuMzcgMTAuNjAyTDUuMjI5IDEwLjAzM0g2LjY1Mkw2Ljc5NSAxMC42MDJDNy41MzUgMTMuNTczIDYuNjE0IDE0Ljc3NCAzLjY0MyAxNC43NzQgLjY5MiAxNC43NzQtLjg0OSAxMy41NzMtMS41OSAxMC42MDJMLTMuMTkyIDQuMTcyQy0zLjkzNCAxLjIwMS0zLjAxMiAwIDAgME03LjYxNiAuMjY1SDkuMDRMMTAuNTg4IDYuNDcxSDEzLjAxIDEzLjI3M0wxNC44OCAuMjY1SDE2LjQ4OEwxNC43NzkgNi42MzRDMTYuNjQ2IDcuMDIxIDE3LjU5MiA4LjIwMSAxOC4xNzEgMTAuNTIxIDE4Ljg5NiAxMy40MzEgMTguMTQ3IDE0LjUxIDE0Ljk1MyAxNC41MUgxMS4xNjhaTTEwLjkxMiA3Ljc3NCAxMi4yNzIgMTMuMjI3SDE0LjY5NEMxNi44OTIgMTMuMjI3IDE3LjI5NCAxMi42MzcgMTYuNzY3IDEwLjUyMSAxNi4yMzMgOC4zODQgMTUuNTMyIDcuNzc0IDEzLjQxNSA3Ljc3NFpNMjMuMTE3IDBDMjYuMjMxIDAgMjcuNzMxIDEuMjAxIDI4LjQ3MyA0LjE3MkwzMC4wNzUgMTAuNjAyQzMwLjgxNiAxMy41NzMgMjkuOTE1IDE0Ljc3NCAyNi44MDEgMTQuNzc0IDIzLjY4NyAxNC43NzQgMjIuMTY3IDEzLjU3MyAyMS40MjcgMTAuNjAyTDE5LjgyMyA0LjE3MkMxOS4wODMgMS4yMDEgMjAuMDA0IDAgMjMuMTE3IDBNMjEuMjQ3IDQuMTcyIDIyLjg1MSAxMC42MDJDMjMuMzk0IDEyLjc4IDI0LjIzOCAxMy40NzIgMjYuNDc3IDEzLjQ3MiAyOC42OTUgMTMuNDcyIDI5LjE5MyAxMi43OCAyOC42NSAxMC42MDJMMjcuMDQ4IDQuMTcyQzI2LjQ5OSAxLjk3NCAyNS42NjEgMS4zMDIgMjMuNDQxIDEuMzAyIDIxLjIwNCAxLjMwMiAyMC42OTkgMS45NzQgMjEuMjQ3IDQuMTcyTTM0LjUzMyAwQzM3LjUyNSAwIDM4Ljg0MiAxLjAzOCAzOS41NTMgMy44ODcgNDAuMTMxIDYuMjA3IDM5LjgzIDcuMTIyIDM3LjcxMyA3Ljg1NUwzNS43MjkgOC41NDdDMzQuNDkxIDguOTc0IDM0LjM2NSA5LjUyNCAzNC43NDUgMTEuMDUgMzUuMTk3IDEyLjg2MSAzNS45MDMgMTMuNDkyIDM3Ljg1NyAxMy40OTIgMzkuNzQ5IDEzLjQ5MiA0MC4yMDMgMTIuODYxIDM5LjY4NiAxMC43ODVMMzkuNTg5IDEwLjM5OUg0MC45OTNMNDEuMDg5IDEwLjc4NUM0MS44MTUgMTMuNjk2IDQxLjA0NiAxNC43NzQgMzguMTc3IDE0Ljc3NCAzNS4yODcgMTQuNzc0IDM0LjA0MSAxMy43NzcgMzMuMzYxIDExLjA1IDMyLjgzNCA4LjkzNCAzMy4wNjMgNy44OTYgMzQuNzg4IDcuMzA2TDM3LjAxNyA2LjUzMkMzOC4zODEgNi4wNDQgMzguNTQ5IDUuNDk0IDM4LjE0OCAzLjg4NyAzNy42NzcgMS45OTQgMzYuOTcgMS4yODIgMzQuODUzIDEuMjgyIDMyLjgxNyAxLjI4MiAzMi4zNCAxLjg5MyAzMi44MjIgMy44MjZMMzIuOTg5IDQuNDk3SDMxLjYwNUwzMS40MzggMy44MjZDMzAuNzQzIDEuMDM4IDMxLjU0MiAwIDM0LjUzMyAwTTQ1LjIxNyAwQzQ4LjIwOCAwIDQ5LjUyNiAxLjAzOCA1MC4yMzYgMy44ODcgNTAuODE0IDYuMjA3IDUwLjUxMyA3LjEyMiA0OC4zOTYgNy44NTVMNDYuNDEyIDguNTQ3QzQ1LjE3NiA4Ljk3NCA0NS4wNDggOS41MjQgNDUuNDI5IDExLjA1IDQ1Ljg4IDEyLjg2MSA0Ni41ODcgMTMuNDkyIDQ4LjU0IDEzLjQ5MiA1MC40MzQgMTMuNDkyIDUwLjg4NiAxMi44NjEgNTAuMzY4IDEwLjc4NUw1MC4yNzIgMTAuMzk5SDUxLjY3Nkw1MS43NzIgMTAuNzg1QzUyLjQ5OCAxMy42OTYgNTEuNzI5IDE0Ljc3NCA0OC44NTkgMTQuNzc0IDQ1Ljk3MSAxNC43NzQgNDQuNzI1IDEzLjc3NyA0NC4wNDQgMTEuMDUgNDMuNTE3IDguOTM0IDQzLjc0NyA3Ljg5NiA0NS40NzIgNy4zMDZMNDcuNzAxIDYuNTMyQzQ5LjA2NCA2LjA0NCA0OS4yMzIgNS40OTQgNDguODMxIDMuODg3IDQ4LjM1OSAxLjk5NCA0Ny42NTMgMS4yODIgNDUuNTM3IDEuMjgyIDQzLjUwMiAxLjI4MiA0My4wMjMgMS44OTMgNDMuNTA1IDMuODI2TDQzLjY3MyA0LjQ5N0g0Mi4yODhMNDIuMTIxIDMuODI2QzQxLjQyNiAxLjAzOCA0Mi4yMjYgMCA0NS4yMTcgME01Mi41NjggLjI2NUg1My45OTNMNTUuNjQyIDYuODc4SDYwLjU4N0w2MC45MDcgOC4xNkg1NS45NjJMNTcuMjI2IDEzLjIyN0g2Mi41NzdMNjIuODk3IDE0LjUxSDU2LjEyWk02Mi4zNzcgLjI2NUg2My44MDJMNjcuMzUzIDE0LjUxSDY1LjkyOVpNNjkuOTg3IC4yNjVINzEuNDEyTDc0LjYzOSAxMy4yMDdINzguMzAyTDc4LjYyNyAxNC41MUg2OS44NzZMNjkuNTUxIDEzLjIwN0g3My4yMTRaIiBmaWxsPSIjMDBhNWIyIi8+DQo8cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSw0My41NzgwNjUsLTE2OS4zMzg0MSkiIGQ9Ik0wIDBINS42NDJMOC4zNDIgMTAuMDc3IDExLjgxMSAxMS40MTQgMTUuMTA0IDBIMjEuNTAzTDE3LjAzNiAxMy41MDlDMTkuNzMgMTQuNzczIDIxLjAyMSAxNi4xMDkgMjIuODk2IDE5LjI4OCAyNC44MTIgMjIuNDY3IDI1LjQ3OCAyMy42MjIgMjYuNDU2IDI1LjI4NEgyMC43MjVDMTkuODY0IDIzLjczMSAxOS4yNTQgMjIuNjExIDE3Ljg1IDIwLjE5MSAxNi4zNzMgMTcuNjYzIDE1LjY0IDE3LjA4NSAxMy4yMzYgMTYuMDczTDkuNTMyIDE0LjUyIDEyLjQxNyAyNS4yODRINi43NzRaTTQ2LjItLjUwNkM1My4yNjUtLjUwNiA1Ni42OTkgMS42OTggNTguMTk5IDcuMjk2TDYxLjA2MyAxNy45ODhDNjIuNTYzIDIzLjU4NiA2MC4zMTEgMjUuNzkgNTMuMjQ2IDI1Ljc5IDQ2LjEzOSAyNS43OSA0Mi43MDUgMjMuNTg2IDQxLjIwNSAxNy45ODhMMzguMzQgNy4yOTZDMzYuODQgMS42OTggMzkuMDkyLS41MDYgNDYuMi0uNTA2TTQzLjkzNyA3LjI5NiA0Ni44MDIgMTcuOTg4QzQ3LjU1NyAyMC44MDUgNDguNzQ4IDIxLjYgNTIuMTIzIDIxLjYgNTUuNDU1IDIxLjYgNTYuMjIxIDIwLjgwNSA1NS40NjYgMTcuOTg4TDUyLjYwMSA3LjI5NkM1MS44NDYgNC40NzkgNTAuNjU1IDMuNjg0IDQ3LjMyMyAzLjY4NCA0My45NDcgMy42ODQgNDMuMTgyIDQuNDc5IDQzLjkzNyA3LjI5Nk02OC4wMTUtLjUwNkM3NC44MTMtLjUwNiA3Ny45NzYgMS41MTcgNzkuNDA4IDYuODYzIDgwLjUyMSAxMS4wMTcgNzkuNTM3IDEzLjE0OCA3NS4xMDMgMTQuMzRMNzEuNDE5IDE1LjM1MUM2OS4yMjkgMTUuOTY1IDY4LjkyNSAxNi42NTEgNjkuNDY3IDE4LjY3NCA3MC4wODYgMjAuOTg2IDcxLjA0NCAyMS43NDQgNzMuOTc3IDIxLjc0NCA3Ni44NjQgMjEuNzQ0IDc3LjQ3MSAyMS4wMjIgNzYuODAzIDE4LjUzTDc2LjYwOSAxNy44MDdIODEuODk2TDgyLjA5IDE4LjUzQzgzLjQ5MyAyMy43NjcgODEuNTkxIDI1Ljc5IDc1LjAxNyAyNS43OSA2OC40NDEgMjUuNzkgNjUuNDc1IDIzLjgzOSA2NC4wOTEgMTguNjc0IDYzLjAxNyAxNC42NjUgNjMuODQyIDEyLjYwNiA2OC4wMjggMTEuNDg2TDcyLjAwMyAxMC40MDNDNzQuMjgyIDkuNzg4IDc0LjYxMiA5LjAzIDc0LjAzMiA2Ljg2MyA3My4zNTQgNC4zMzQgNzIuMzQyIDMuNTQgNjkuMTQ0IDMuNTQgNjUuOTg4IDMuNTQgNjUuMjU5IDQuMjk4IDY1LjkzNyA2LjgyN0w2Ni4yMDcgNy44MzhINjAuOTJMNjAuNjQ5IDYuODI3QzU5LjIyNyAxLjUxNyA2MS4yNjItLjUwNiA2OC4wMTUtLjUwNiIgZmlsbD0iI2ZmZmZmZiIvPg0KPC9nPg0KPHBhdGggdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsNjguODMwOTYsLTE4My44ODQzMSkiIGQ9Ik0wIDBIOS41NzFMOC40MTEtNC42NUgtMS4xNTlaIiBmaWxsPSIjZmZmZmZmIi8+DQo8ZyBjbGlwLXBhdGg9InVybCgjY2xpcF80KSI+DQo8cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSwtMTk0Ljc2MDMzLC0xMzEuMjAxMikiIHN0cm9rZS13aWR0aD0iNy41MzUiIHN0cm9rZS1saW5lY2FwPSJidXR0IiBzdHJva2UtbWl0ZXJsaW1pdD0iNCIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDBhNWIyIiBkPSJNMCAwQzUzLjMwMSAwIDk2LjUxIDQzLjIwOSA5Ni41MSA5Ni41MSA5Ni41MSAxNDkuODExIDUzLjMwMSAxOTMuMDIgMCAxOTMuMDItNTMuMzAxIDE5My4wMi05Ni41MSAxNDkuODExLTk2LjUxIDk2LjUxLTk2LjUxIDQzLjIwOS01My4zMDEgMCAwIDBaIi8+DQo8L2c+DQo8cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSwtMjUzLjAwMDUyLC0xNzYuMDUyOCkiIGQ9Ik0wIDBIMjkuNDI4TDQwLjEwNyAzNS4zNiAzMi4wMzggMzUuNDIxIDUzLjE2IDU0LjgyMSA1OC42MTggMzUuMzZINjYuOTI0TDc3LjM2NiAwSDEwNi4zMTlMOTYuMTE0IDM1LjM2SDg4LjI4M0w3Ni42NTQgNzQuOTkzIDg1LjY3MiA4My4wNjJIODAuMjE0TDExNC42MjUgMTE2LjQ1NEg4Ni4xNDdMNTIuNjg1IDgzLjA2Mkg1Ny41NzFMNDEuMjk0IDY3Ljg3MyA0Ni4wNCA4My4wNjJIMzcuNzM0TDUwLjA3NCAxMTYuNDU0SDIxLjU5NkwxMC4yMDUgODMuMDYySDE3LjA4N0wyLjg0OCAzNS4zNkgxMC4yMDVaIiBmaWxsPSIjMDBhNWIyIi8+DQo8cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSwtMjMxLjQwNDMzLC0yOTIuNTA2OSkiIGQ9Ik0wIDAtMTEuMzkxLTMzLjM5M0gtNC41MDlMLTE1LjY2OS03MC43NzkgMjMuOTMzLTMzLjM5M0gxNi4xMzhMMjguNDc5IDBaIiBmaWxsPSIjZmZmZmZmIi8+DQo8ZyBjbGlwLXBhdGg9InVybCgjY2xpcF81KSI+DQo8cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSwtMjEzLjQ4NDQyLC0xNTYuNzcyNDkpIiBkPSJNMCAwQzIuNjg5IDAgNC4wODQgMS4wODcgNC43NTQgMy43NzZMNC45MTUgNC40MkgzLjYyNUwzLjQ2NCAzLjc3NkMyLjk2OCAxLjc4NyAyLjE5MSAxLjE3OSAuMjk0IDEuMTc5LTEuNjQgMS4xNzktMi4wOTcgMS43ODctMS42MDEgMy43NzZMLS4xNDkgOS41OTZDLjM0MiAxMS41NjcgMS4xMDYgMTIuMTkzIDMuMDAzIDEyLjE5MyA0Ljg4MiAxMi4xOTMgNS4zNTIgMTEuNTY3IDQuODYgOS41OTZMNC43MzIgOS4wOEg2LjAyMUw2LjE0OSA5LjU5NkM2LjgyIDEyLjI4NSA1Ljk4NiAxMy4zNzIgMy4yOTcgMTMuMzcyIC42MjYgMTMuMzcyLS43NjggMTIuMjg1LTEuNDM4IDkuNTk2TC0yLjg5IDMuNzc2Qy0zLjU2IDEuMDg3LTIuNzI2IDAgMCAwTTYuODkzIC4yMzlIOC4xODJMOS41ODIgNS44NTdIMTEuNzc0IDEyLjAxNEwxMy40NjcgLjIzOUgxNC45MjNMMTMuMzc3IDYuMDA0QzE1LjA2NiA2LjM1NCAxNS45MjMgNy40MjMgMTYuNDQ2IDkuNTIyIDE3LjEwMyAxMi4xNTYgMTYuNDI1IDEzLjEzMiAxMy41MzMgMTMuMTMySDEwLjEwN1pNOS44NzYgNy4wMzYgMTEuMTA3IDExLjk3MkgxMy4yOTlDMTUuMjg4IDExLjk3MiAxNS42NTMgMTEuNDM4IDE1LjE3NSA5LjUyMiAxNC42OTMgNy41ODggMTQuMDU3IDcuMDM2IDEyLjE0MiA3LjAzNlpNMjAuOTIzIDBDMjMuNzQxIDAgMjUuMDk5IDEuMDg3IDI1Ljc3IDMuNzc2TDI3LjIyIDkuNTk2QzI3Ljg5MSAxMi4yODUgMjcuMDc1IDEzLjM3MiAyNC4yNTcgMTMuMzcyIDIxLjQzOSAxMy4zNzIgMjAuMDYzIDEyLjI4NSAxOS4zOTMgOS41OTZMMTcuOTQxIDMuNzc2QzE3LjI3MSAxLjA4NyAxOC4xMDUgMCAyMC45MjMgME0xOS4yMyAzLjc3NiAyMC42ODIgOS41OTZDMjEuMTczIDExLjU2NyAyMS45MzcgMTIuMTkzIDIzLjk2MyAxMi4xOTMgMjUuOTcxIDEyLjE5MyAyNi40MjMgMTEuNTY3IDI1LjkzMiA5LjU5NkwyNC40OCAzLjc3NkMyMy45ODQgMS43ODcgMjMuMjI1IDEuMTc5IDIxLjIxNyAxLjE3OSAxOS4xOTEgMS4xNzkgMTguNzM0IDEuNzg3IDE5LjIzIDMuNzc2TTMxLjI1NiAwQzMzLjk2MyAwIDM1LjE1NSAuOTM5IDM1Ljc5OCAzLjUxOCAzNi4zMjIgNS42MTggMzYuMDQ5IDYuNDQ3IDM0LjEzNCA3LjExTDMyLjMzOCA3LjczNkMzMS4yMTggOC4xMjMgMzEuMTAzIDguNjIgMzEuNDQ3IDEwLjAwMSAzMS44NTYgMTEuNjQxIDMyLjQ5NiAxMi4yMTIgMzQuMjY0IDEyLjIxMiAzNS45NzcgMTIuMjEyIDM2LjM4NyAxMS42NDEgMzUuOTE5IDkuNzYyTDM1LjgzMiA5LjQxMkgzNy4xMDJMMzcuMTg5IDkuNzYyQzM3Ljg0NiAxMi4zOTYgMzcuMTUgMTMuMzcyIDM0LjU1MyAxMy4zNzIgMzEuOTM4IDEzLjM3MiAzMC44MSAxMi40NjkgMzAuMTk0IDEwLjAwMSAyOS43MTcgOC4wODYgMjkuOTI1IDcuMTQ2IDMxLjQ4NiA2LjYxMkwzMy41MDMgNS45MTJDMzQuNzM4IDUuNDcgMzQuODkgNC45NzMgMzQuNTI3IDMuNTE4IDM0LjEgMS44MDUgMzMuNDYgMS4xNiAzMS41NDUgMS4xNiAyOS43MDMgMS4xNiAyOS4yNyAxLjcxMyAyOS43MDYgMy40NjNMMjkuODU4IDQuMDcxSDI4LjYwNkwyOC40NTQgMy40NjNDMjcuODI1IC45MzkgMjguNTQ4IDAgMzEuMjU2IDBNNDAuOTI1IDBDNDMuNjMzIDAgNDQuODI1IC45MzkgNDUuNDY4IDMuNTE4IDQ1Ljk5MiA1LjYxOCA0NS43MTkgNi40NDcgNDMuODA0IDcuMTFMNDIuMDA3IDcuNzM2QzQwLjg4OCA4LjEyMyA0MC43NzIgOC42MiA0MS4xMTYgMTAuMDAxIDQxLjUyNSAxMS42NDEgNDIuMTY1IDEyLjIxMiA0My45MzQgMTIuMjEyIDQ1LjY0NiAxMi4yMTIgNDYuMDU2IDExLjY0MSA0NS41ODggOS43NjJMNDUuNSA5LjQxMkg0Ni43NzFMNDYuODU5IDkuNzYyQzQ3LjUxNiAxMi4zOTYgNDYuODIgMTMuMzcyIDQ0LjIyMyAxMy4zNzIgNDEuNjA3IDEzLjM3MiA0MC40NzkgMTIuNDY5IDM5Ljg2NCAxMC4wMDEgMzkuMzg3IDguMDg2IDM5LjU5NSA3LjE0NiA0MS4xNTUgNi42MTJMNDMuMTczIDUuOTEyQzQ0LjQwOCA1LjQ3IDQ0LjU2IDQuOTczIDQ0LjE5NyAzLjUxOCA0My43NyAxLjgwNSA0My4xMyAxLjE2IDQxLjIxNCAxLjE2IDM5LjM3MyAxLjE2IDM4Ljk0IDEuNzEzIDM5LjM3NiAzLjQ2M0wzOS41MjggNC4wNzFIMzguMjc1TDM4LjEyMyAzLjQ2M0MzNy40OTQgLjkzOSAzOC4yMTggMCA0MC45MjUgME00Ny41NzkgLjIzOUg0OC44NjhMNTAuMzYgNi4yMjVINTQuODM2TDU1LjEyNSA3LjM4Nkg1MC42NDlMNTEuNzkzIDExLjk3Mkg1Ni42MzhMNTYuOTI3IDEzLjEzMkg1MC43OTNaTTU2LjQ1NyAuMjM5SDU3Ljc0Nkw2MC45NiAxMy4xMzJINTkuNjcxWk02My4zNDQgLjIzOUg2NC42MzRMNjcuNTU1IDExLjk1NEg3MC44N0w3MS4xNjQgMTMuMTMySDYzLjI0NEw2Mi45NSAxMS45NTRINjYuMjY1WiIgZmlsbD0iIzAwYTViMiIvPg0KPHBhdGggdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsLTIxMy4zMTc5MiwtMTc2LjEzMTQxKSIgZD0iTTAgMEg1LjEwN0w3LjU1MSA5LjEyMSAxMC42OSAxMC4zMzEgMTMuNjcyIDBIMTkuNDYyTDE1LjQyIDEyLjIyN0MxNy44NTggMTMuMzcxIDE5LjAyNiAxNC41ODEgMjAuNzIyIDE3LjQ1NyAyMi40NTggMjAuMzM0IDIzLjA2IDIxLjM4IDIzLjk0NSAyMi44ODRIMTguNzU4QzE3Ljk3OSAyMS40NzkgMTcuNDI3IDIwLjQ2NSAxNi4xNTYgMTguMjc1IDE0LjgxOSAxNS45ODYgMTQuMTU2IDE1LjQ2MyAxMS45OCAxNC41NDhMOC42MjggMTMuMTQyIDExLjIzOSAyMi44ODRINi4xMzJaTTQxLjgxNi0uNDU4QzQ4LjIwOS0uNDU4IDUxLjMxOCAxLjUzNyA1Mi42NzYgNi42MDRMNTUuMjY5IDE2LjI4MUM1Ni42MjYgMjEuMzQ4IDU0LjU4NiAyMy4zNDIgNDguMTk0IDIzLjM0MiA0MS43NiAyMy4zNDIgMzguNjUxIDIxLjM0OCAzNy4yOTMgMTYuMjgxTDM0LjcwMSA2LjYwNEMzMy4zNDMgMS41MzcgMzUuMzgyLS40NTggNDEuODE2LS40NThNMzkuNzY4IDYuNjA0IDQyLjM2MSAxNi4yODFDNDMuMDQ0IDE4LjgzMSA0NC4xMjIgMTkuNTUgNDcuMTc4IDE5LjU1IDUwLjE5MiAxOS41NSA1MC44ODUgMTguODMxIDUwLjIwMiAxNi4yODFMNDcuNjA5IDYuNjA0QzQ2LjkyNSA0LjA1NCA0NS44NDggMy4zMzUgNDIuODMzIDMuMzM1IDM5Ljc3NyAzLjMzNSAzOS4wODQgNC4wNTQgMzkuNzY4IDYuNjA0TTYxLjU2LS40NThDNjcuNzEyLS40NTggNzAuNTc1IDEuMzczIDcxLjg3MiA2LjIxMSA3Mi44NzkgOS45NzEgNzEuOTg5IDExLjkgNjcuOTc1IDEyLjk3OUw2NC42NDEgMTMuODk0QzYyLjY1OSAxNC40NSA2Mi4zODMgMTUuMDcxIDYyLjg3NCAxNi45MDIgNjMuNDM1IDE4Ljk5NCA2NC4zMDIgMTkuNjgxIDY2Ljk1NiAxOS42ODEgNjkuNTcgMTkuNjgxIDcwLjExOSAxOS4wMjcgNjkuNTE0IDE2Ljc3MUw2OS4zMzkgMTYuMTE3SDc0LjEyNEw3NC4yOTkgMTYuNzcxQzc1LjU2OSAyMS41MTEgNzMuODQ4IDIzLjM0MiA2Ny44OTYgMjMuMzQyIDYxLjk0NiAyMy4zNDIgNTkuMjYxIDIxLjU3NyA1OC4wMDggMTYuOTAyIDU3LjAzNiAxMy4yNzMgNTcuNzgzIDExLjQwOSA2MS41NzMgMTAuMzk2TDY1LjE3IDkuNDE1QzY3LjIzMyA4Ljg1OSA2Ny41MzEgOC4xNzMgNjcuMDA1IDYuMjExIDY2LjM5MiAzLjkyMyA2NS40NzcgMy4yMDQgNjIuNTgxIDMuMjA0IDU5LjcyNiAzLjIwNCA1OS4wNjUgMy44OSA1OS42NzkgNi4xNzlMNTkuOTI0IDcuMDk0SDU1LjEzOUw1NC44OTQgNi4xNzlDNTMuNjA2IDEuMzczIDU1LjQ0Ny0uNDU4IDYxLjU2LS40NTgiIGZpbGw9IiNmZmZmZmYiLz4NCjwvZz4NCjxwYXRoIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLC0xOTAuNDYxNTIsLTE4OS4yOTc0KSIgZD0iTTAgMEg4LjY2Mkw3LjYxMy00LjIwOEgtMS4wNDlaIiBmaWxsPSIjZmZmZmZmIi8+DQo8cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSwtLjAwMDAzMDUxNzU3OSwxMjguNjY1MDEpIiBkPSJNMCAwSDMyLjUxM0w0NC4zMTMgMzkuMDY3IDM1LjM5NyAzOS4xMzYgNTguNzMzIDYwLjU2OCA2NC43NjUgMzkuMDY3SDczLjk0MUw4NS40NzkgMEgxMTcuNDY4TDEwNi4xOTIgMzkuMDY3SDk3LjU0TDg0LjY5MSA4Mi44NTUgOTQuNjU2IDkxLjc3MUg4OC42MjVMMTI2LjY0NSAxMjguNjY1SDk1LjE4TDU4LjIwOSA5MS43NzFINjMuNjA3TDQ1LjYyNCA3NC45OSA1MC44NjggOTEuNzcxSDQxLjY5TDU1LjMyNSAxMjguNjY1SDIzLjg2TDExLjI3NCA5MS43NzFIMTguODc5TDMuMTQ2IDM5LjA2N0gxMS4yNzRaIiBmaWxsPSIjMDBhNWIyIi8+DQo8cGF0aCB0cmFuc2Zvcm09Im1hdHJpeCgxLDAsMCwtMSwyMy44NjEyNjgsMCkiIGQ9Ik0wIDAtMTIuNTg4LTM2Ljg5NUgtNC45ODJMLTE3LjMxMy03OC4yIDI2LjQ0MS0zNi44OTVIMTcuODI5TDMxLjQ2NCAwWiIgZmlsbD0iIzFkMWQxYiIvPg0KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXBfNikiPg0KPHBhdGggdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsNDMuNDEzOTcsMTUwLjMxOTMpIiBkPSJNMCAwQzMuMDczIDAgNC42MzUgMS4yMDEgNS4zOTYgNC4yNTNMNS41NzggNC45ODZIMy42MjRMMy40NDEgNC4yNTNDMi45NjUgMi4zNDEgMi4yNzcgMS43OTEgLjQ0NiAxLjc5MS0xLjM4NiAxLjc5MS0xLjc5OCAyLjM0MS0xLjMyIDQuMjUzTC4yMzcgMTAuNTAxQy43MTQgMTIuNDEzIDEuNDA1IDEyLjk4MyAzLjE5NiAxMi45ODMgNS4wMDcgMTIuOTgzIDUuNDM1IDEyLjQxMyA0Ljk1OCAxMC41MDFMNC44MTYgOS45MzJINi43NzFMNi45MTIgMTAuNTAxQzcuNjc4IDEzLjU3MyA2LjcxNiAxNC43NzQgMy42NDMgMTQuNzc0IC41OTEgMTQuNzc0LS45NzEgMTMuNTczLTEuNzM2IDEwLjUwMUwtMy4yOTUgNC4yNTNDLTQuMDU2IDEuMjAxLTMuMTE0IDAgMCAwTTcuNDk0IC4yNjZIOS40NDdMMTAuOTI0IDYuMTg3SDEzLjA0TDE0LjQ5NCAuMjY2SDE2LjcxMkwxNS4wOTYgNi40MzJDMTYuODI1IDYuOTE5IDE3Ljc4IDguMTQxIDE4LjMzNCAxMC4zNTggMTkuMDg1IDEzLjM3IDE4LjI3IDE0LjUxMSAxNS4wNTUgMTQuNTExSDExLjA0NlpNMTEuMzY1IDcuOTU3IDEyLjU1OCAxMi43MzlIMTQuNjMzQzE2LjU0NiAxMi43MzkgMTYuODY3IDEyLjIzIDE2LjQgMTAuMzU4IDE1LjkyOSA4LjQ2NyAxNS4zNTQgNy45NTcgMTMuNTIxIDcuOTU3Wk0yMy4yMTkgMEMyNi40MTQgMCAyNy45NTUgMS4yMDEgMjguNzE3IDQuMjUzTDMwLjI3NCAxMC41MDFDMzEuMDQgMTMuNTczIDMwLjA5OCAxNC43NzQgMjYuOTAyIDE0Ljc3NCAyMy43MjkgMTQuNzc0IDIyLjE2NyAxMy41NzMgMjEuNDAxIDEwLjUwMUwxOS44NDQgNC4yNTNDMTkuMDgyIDEuMjAxIDIwLjA0NSAwIDIzLjIxOSAwTTIxLjgxNyA0LjI1MyAyMy4zNzUgMTAuNTAxQzIzLjg1MiAxMi40MTMgMjQuNTQzIDEyLjk4MyAyNi40NTYgMTIuOTgzIDI4LjM5IDEyLjk4MyAyOC43OTcgMTIuNDEzIDI4LjMyIDEwLjUwMUwyNi43NjMgNC4yNTNDMjYuMjg1IDIuMzQxIDI1LjYgMS43OTEgMjMuNjY2IDEuNzkxIDIxLjc1MyAxLjc5MSAyMS4zNDEgMi4zNDEgMjEuODE3IDQuMjUzTTM0LjY1NiAwQzM3LjcwOCAwIDM5LjA3IDEuMDU5IDM5LjgwMiAzLjk4OSA0MC4zOSA2LjM1IDQwLjA3NCA3LjM2NyAzNy45MzggOC4xTDM2LjE1NSA4LjcxQzM1LjAxMSA5LjA5NyAzNC45MDMgOS41NjQgMzUuMjQ0IDEwLjkyOSAzNS42MzUgMTIuNDk1IDM2LjE5OSAxMy4wNDQgMzcuODg5IDEzLjA0NCAzOS41MTcgMTMuMDQ0IDM5Ljg3MiAxMi41MTYgMzkuNDI2IDEwLjcyNUwzOS4zMzUgMTAuMzU4SDQxLjIwN0w0MS4yOTggMTAuNzI1QzQyLjAzMyAxMy42NzYgNDEuMjUgMTQuNzc0IDM4LjMxOSAxNC43NzQgMzUuMzQ4IDE0Ljc3NCAzNC4wNTIgMTMuNzM2IDMzLjM1MiAxMC45MjkgMzIuNzk5IDguNzEgMzMuMDU5IDcuNjMyIDM0LjkgNy4wMjFMMzYuODg1IDYuMzI5QzM4LjE0MyA1LjkwMiAzOC4yNyA1LjQzNCAzNy45MDkgMy45ODkgMzcuNDk4IDIuMzQxIDM2LjkxOCAxLjczIDM1LjA4NyAxLjczIDMzLjMxNiAxLjczIDMyLjk0IDIuMjYgMzMuMzcxIDMuOTg5TDMzLjUxOSA0LjU3OUgzMS42MjZMMzEuNDc5IDMuOTg5QzMwLjc3MyAxLjA3OSAzMS42MDQgMCAzNC42NTYgME00NS4zNiAwQzQ4LjQxMiAwIDQ5Ljc3NCAxLjA1OSA1MC41MDYgMy45ODkgNTEuMDk0IDYuMzUgNTAuNzc5IDcuMzY3IDQ4LjY0MiA4LjFMNDYuODU5IDguNzFDNDUuNzE1IDkuMDk3IDQ1LjYwNyA5LjU2NCA0NS45NDcgMTAuOTI5IDQ2LjMzOCAxMi40OTUgNDYuOTAzIDEzLjA0NCA0OC41OTIgMTMuMDQ0IDUwLjIyMSAxMy4wNDQgNTAuNTc2IDEyLjUxNiA1MC4xMyAxMC43MjVMNTAuMDM5IDEwLjM1OEg1MS45MUw1Mi4wMDIgMTAuNzI1QzUyLjczNyAxMy42NzYgNTEuOTUzIDE0Ljc3NCA0OS4wMjMgMTQuNzc0IDQ2LjA1MiAxNC43NzQgNDQuNzU2IDEzLjczNiA0NC4wNTYgMTAuOTI5IDQzLjUwMyA4LjcxIDQzLjc2MyA3LjYzMiA0NS42MDQgNy4wMjFMNDcuNTg5IDYuMzI5QzQ4Ljg0NyA1LjkwMiA0OC45NzQgNS40MzQgNDguNjEzIDMuOTg5IDQ4LjIwMiAyLjM0MSA0Ny42MjIgMS43MyA0NS43OTEgMS43MyA0NC4wMjEgMS43MyA0My42NDUgMi4yNiA0NC4wNzUgMy45ODlMNDQuMjIzIDQuNTc5SDQyLjMzTDQyLjE4MyAzLjk4OUM0MS40NzkgMS4wNzkgNDIuMzA3IDAgNDUuMzYgME01Mi41ODkgLjI2Nkg1NC41NjNMNTYuMTQxIDYuNTk0SDYwLjgwMUw2MS4yNDIgOC4zNjRINTYuNTgyTDU3LjY2OCAxMi43Mkg2Mi43MTVMNjMuMTYyIDE0LjUxMUg1Ni4xNDFaTTYyLjQ3OSAuMjY2SDY0LjQ1M0w2OC4wMDUgMTQuNTExSDY2LjAzMVpNNzAuMjkzIC4yNjZINzIuMjY4TDc1LjM2NyAxMi42OThINzguODI3TDc5LjI3OSAxNC41MTFINzAuMzg2TDY5LjkzNCAxMi42OThINzMuMzkzWiIgZmlsbD0iIzAwYTViMiIvPg0KPHBhdGggdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsNDMuNTc4MDY1LDEyOC45Mjk2KSIgZD0iTTAgMEg1LjY0Mkw4LjM0MiAxMC4wNzcgMTEuODExIDExLjQxNCAxNS4xMDQgMEgyMS41MDNMMTcuMDM3IDEzLjUwOUMxOS43MyAxNC43NzIgMjEuMDIxIDE2LjEwOCAyMi44OTYgMTkuMjg4IDI0LjgxMiAyMi40NjcgMjUuNDc4IDIzLjYyMiAyNi40NTYgMjUuMjg0SDIwLjcyNUMxOS44NjQgMjMuNzMgMTkuMjU0IDIyLjYxIDE3Ljg1IDIwLjE5IDE2LjM3MyAxNy42NjMgMTUuNjQgMTcuMDg1IDEzLjIzNiAxNi4wNzNMOS41MzIgMTQuNTIgMTIuNDE3IDI1LjI4NEg2Ljc3NFpNNDYuMi0uNTA2QzUzLjI2NS0uNTA2IDU2LjY5OSAxLjY5OCA1OC4xOTkgNy4yOTZMNjEuMDYzIDE3Ljk4OEM2Mi41NjMgMjMuNTg2IDYwLjMxMSAyNS43OSA1My4yNDYgMjUuNzkgNDYuMTM5IDI1Ljc5IDQyLjcwNSAyMy41ODYgNDEuMjA1IDE3Ljk4OEwzOC4zNCA3LjI5NkMzNi44NCAxLjY5OCAzOS4wOTMtLjUwNiA0Ni4yLS41MDZNNDMuOTM3IDcuMjk2IDQ2LjgwMiAxNy45ODhDNDcuNTU3IDIwLjgwNSA0OC43NDggMjEuNiA1Mi4xMjQgMjEuNiA1NS40NTYgMjEuNiA1Ni4yMjEgMjAuODA1IDU1LjQ2NiAxNy45ODhMNTIuNjAxIDcuMjk2QzUxLjg0NiA0LjQ3OSA1MC42NTUgMy42ODQgNDcuMzIzIDMuNjg0IDQzLjk0NyAzLjY4NCA0My4xODIgNC40NzkgNDMuOTM3IDcuMjk2TTY4LjAxNS0uNTA2Qzc0LjgxMy0uNTA2IDc3Ljk3NiAxLjUxNyA3OS40MDggNi44NjMgODAuNTIxIDExLjAxNyA3OS41MzcgMTMuMTQ3IDc1LjEwMyAxNC4zNEw3MS40MTkgMTUuMzUxQzY5LjIyOSAxNS45NjUgNjguOTI1IDE2LjY1IDY5LjQ2NyAxOC42NzQgNzAuMDg2IDIwLjk4NSA3MS4wNDQgMjEuNzQ0IDczLjk3NyAyMS43NDQgNzYuODY0IDIxLjc0NCA3Ny40NzEgMjEuMDIxIDc2LjgwMyAxOC41M0w3Ni42MDkgMTcuODA3SDgxLjg5Nkw4Mi4wOSAxOC41M0M4My40OTMgMjMuNzY3IDgxLjU5MiAyNS43OSA3NS4wMTcgMjUuNzkgNjguNDQxIDI1Ljc5IDY1LjQ3NSAyMy44MzkgNjQuMDkxIDE4LjY3NCA2My4wMTcgMTQuNjY1IDYzLjg0MiAxMi42MDUgNjguMDI4IDExLjQ4NUw3Mi4wMDMgMTAuNDAyQzc0LjI4MiA5Ljc4OCA3NC42MTIgOS4wMyA3NC4wMzIgNi44NjMgNzMuMzU0IDQuMzM0IDcyLjM0MiAzLjU0IDY5LjE0NCAzLjU0IDY1Ljk4OCAzLjU0IDY1LjI1OSA0LjI5OCA2NS45MzcgNi44MjdMNjYuMjA3IDcuODM4SDYwLjkyTDYwLjY0OSA2LjgyN0M1OS4yMjcgMS41MTcgNjEuMjYyLS41MDYgNjguMDE1LS41MDYiIGZpbGw9IiMxZDFkMWIiLz4NCjwvZz4NCjxwYXRoIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLDY4LjgzMDk2LDExNC4zODQ3MDgpIiBkPSJNMCAwSDkuNTcxTDguNDEyLTQuNjVILTEuMTU5WiIgZmlsbD0iIzFkMWQxYiIvPg0KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXBfNykiPg0KPHBhdGggdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsLTE5OS42ODY2MywxNzYuNjM5NikiIHN0cm9rZS13aWR0aD0iNy42OTIiIHN0cm9rZS1saW5lY2FwPSJidXR0IiBzdHJva2UtbWl0ZXJsaW1pdD0iNCIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDBhNWIyIiBkPSJNMCAwQzU0LjQxMyAwIDk4LjUyMyA0NC4xMDkgOTguNTIzIDk4LjUyMSA5OC41MjMgMTUyLjkzNiA1NC40MTMgMTk3LjA0NiAwIDE5Ny4wNDYtNTQuNDEzIDE5Ny4wNDYtOTguNTIzIDE1Mi45MzYtOTguNTIzIDk4LjUyMS05OC41MjMgNDQuMTA5LTU0LjQxMyAwIDAgMFoiLz4NCjwvZz4NCjxwYXRoIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLC0yNTkuMTQxMjUsMTMwLjg1MjUxKSIgZD0iTTAgMEgzMC4wNDFMNDAuOTQ0IDM2LjA5OSAzMi43MDYgMzYuMTYgNTQuMjY4IDU1Ljk2NCA1OS44NDEgMzYuMDk5SDY4LjMyTDc4Ljk4IDBIMTA4LjUzN0w5OC4xMTkgMzYuMDk5SDkwLjEyNEw3OC4yNTMgNzYuNTU3IDg3LjQ1OSA4NC43OTRIODEuODg3TDExNy4wMTYgMTE4Ljg4M0g4Ny45NDRMNTMuNzg0IDg0Ljc5NEg1OC43NzJMNDIuMTU1IDY5LjI4OSA0NyA4NC43OTRIMzguNTIxTDUxLjExOSAxMTguODgzSDIyLjA0N0wxMC40MTggODQuNzk0SDE3LjQ0M0wyLjkwNyAzNi4wOTlIMTAuNDE4WiIgZmlsbD0iIzAwYTViMiIvPg0KPHBhdGggdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsLTIzNy4wOTUzMiwxMS45Njk3MTEpIiBkPSJNMCAwLTExLjYyOS0zNC4wODlILTQuNjAzTC0xNS45OTUtNzIuMjU1IDI0LjQzMy0zNC4wODlIMTYuNDc0TDI5LjA3MyAwWiIgZmlsbD0iIzFkMWQxYiIvPg0KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXBfOCkiPg0KPHBhdGggdHJhbnNmb3JtPSJtYXRyaXgoMSwwLDAsLTEsLTIxOC43ODIzMiwxNTAuNTM0MSkiIGQ9Ik0wIDBDMi44MzkgMCA0LjI4MSAxLjEwOCA0Ljk4NSAzLjkzTDUuMTUzIDQuNjA2SDMuMzQ5TDMuMTggMy45M0MyLjczOSAyLjE2MiAyLjEwNCAxLjY1NCAuNDEzIDEuNjU0LTEuMjggMS42NTQtMS42NjEgMi4xNjItMS4yMiAzLjkzTC4yMTkgOS43MDFDLjY2IDExLjQ3IDEuMjk5IDExLjk5NiAyLjk1MyAxMS45OTYgNC42MjcgMTEuOTk2IDUuMDIxIDExLjQ3IDQuNTgxIDkuNzAxTDQuNDUgOS4xNzZINi4yNTVMNi4zODYgOS43MDFDNy4wOTQgMTIuNTQxIDYuMjA2IDEzLjY1IDMuMzY1IDEzLjY1IC41NDUgMTMuNjUtLjg5NyAxMi41NDEtMS42MDUgOS43MDFMLTMuMDQ0IDMuOTNDLTMuNzQ4IDEuMTA4LTIuODc3IDAgMCAwTTYuOTI0IC4yNDNIOC43MjlMMTAuMDkzIDUuNzE2SDEyLjA0OUwxMy4zOTIgLjI0M0gxNS40NDFMMTMuOTQ3IDUuOTQxQzE1LjU0NiA2LjM5MyAxNi40MjggNy41MjEgMTYuOTM5IDkuNTcgMTcuNjMzIDEyLjM1MyAxNi44OCAxMy40MDUgMTMuOTA5IDEzLjQwNUgxMC4yMDVaTTEwLjUwMSA3LjM1MiAxMS42MDMgMTEuNzcxSDEzLjUyMUMxNS4yODggMTEuNzcxIDE1LjU4NCAxMS4zIDE1LjE1MyA5LjU3IDE0LjcxNyA3LjgyMSAxNC4xODYgNy4zNTIgMTIuNDk0IDcuMzUyWk0yMS40NTQgMEMyNC40MDYgMCAyNS44MjkgMS4xMDggMjYuNTMzIDMuOTNMMjcuOTcyIDkuNzAxQzI4LjY4IDEyLjU0MSAyNy44MSAxMy42NSAyNC44NTcgMTMuNjUgMjEuOTI0IDEzLjY1IDIwLjQ4MSAxMi41NDEgMTkuNzc0IDkuNzAxTDE4LjMzNCAzLjkzQzE3LjYzMSAxLjEwOCAxOC41MjEgMCAyMS40NTQgME0yMC4xNTkgMy45MyAyMS41OTggOS43MDFDMjIuMDM5IDExLjQ3IDIyLjY3OCAxMS45OTYgMjQuNDQ1IDExLjk5NiAyNi4yMzEgMTEuOTk2IDI2LjYwNyAxMS40NyAyNi4xNjcgOS43MDFMMjQuNzI4IDMuOTNDMjQuMjg3IDIuMTYyIDIzLjY1MiAxLjY1NCAyMS44NjYgMS42NTQgMjAuMSAxLjY1NCAxOS43MTggMi4xNjIgMjAuMTU5IDMuOTNNMzIuMDIxIDBDMzQuODQxIDAgMzYuMTAxIC45NzggMzYuNzc1IDMuNjg1IDM3LjMxOSA1Ljg2NSAzNy4wMjcgNi44MDcgMzUuMDUzIDcuNDgzTDMzLjQwNiA4LjA0OEMzMi4zNSA4LjQwNCAzMi4yNSA4LjgzNyAzMi41NjQgMTAuMDk3IDMyLjkyNSAxMS41NDUgMzMuNDQ3IDEyLjA1MyAzNS4wMDcgMTIuMDUzIDM2LjUxMSAxMi4wNTMgMzYuODQxIDExLjU2MyAzNi40MjggOS45MDhMMzYuMzQ0IDkuNTdIMzguMDc0TDM4LjE1OCA5LjkwOEMzOC44MzggMTIuNjM1IDM4LjExMyAxMy42NSAzNS40MDUgMTMuNjUgMzIuNjYgMTMuNjUgMzEuNDYyIDEyLjY5MSAzMC44MTUgMTAuMDk3IDMwLjMwNCA4LjA0OCAzMC41NDUgNy4wNTEgMzIuMjQ3IDYuNDg2TDM0LjA4MSA1Ljg0OEMzNS4yNDEgNS40NTIgMzUuMzU5IDUuMDIgMzUuMDI2IDMuNjg1IDM0LjY0NyAyLjE2MiAzNC4xMTEgMS41OTggMzIuNDE5IDEuNTk4IDMwLjc4MyAxLjU5OCAzMC40MzUgMi4wODcgMzAuODMzIDMuNjg1TDMwLjk3IDQuMjNIMjkuMjIxTDI5LjA4NCAzLjY4NUMyOC40MzQgLjk5NyAyOS4yMDEgMCAzMi4wMjEgME00MS45MTEgMEM0NC43MzIgMCA0NS45OTEgLjk3OCA0Ni42NjYgMy42ODUgNDcuMjA5IDUuODY1IDQ2LjkxNyA2LjgwNyA0NC45NDMgNy40ODNMNDMuMjk3IDguMDQ4QzQyLjIzOSA4LjQwNCA0Mi4xNCA4LjgzNyA0Mi40NTQgMTAuMDk3IDQyLjgxNSAxMS41NDUgNDMuMzM3IDEyLjA1MyA0NC44OTcgMTIuMDUzIDQ2LjQwMiAxMi4wNTMgNDYuNzMxIDExLjU2MyA0Ni4zMTggOS45MDhMNDYuMjM0IDkuNTdINDcuOTY0TDQ4LjA0OCA5LjkwOEM0OC43MjggMTIuNjM1IDQ4LjAwMyAxMy42NSA0NS4yOTUgMTMuNjUgNDIuNTUgMTMuNjUgNDEuMzUyIDEyLjY5MSA0MC43MDUgMTAuMDk3IDQwLjE5NCA4LjA0OCA0MC40MzUgNy4wNTEgNDIuMTM3IDYuNDg2TDQzLjk3MSA1Ljg0OEM0NS4xMzIgNS40NTIgNDUuMjUgNS4wMiA0NC45MTcgMy42ODUgNDQuNTM3IDIuMTYyIDQ0LjAwMSAxLjU5OCA0Mi4zMDkgMS41OTggNDAuNjczIDEuNTk4IDQwLjMyNSAyLjA4NyA0MC43MjQgMy42ODVMNDAuODYgNC4yM0gzOS4xMTJMMzguOTc2IDMuNjg1QzM4LjMyMyAuOTk3IDM5LjA5MSAwIDQxLjkxMSAwTTQ4LjU5MSAuMjQzSDUwLjQxNUw1MS44NzMgNi4wOTJINTYuMTc4TDU2LjU4NSA3LjcyOEg1Mi4yODFMNTMuMjg0IDExLjc1Mkg1Ny45NDdMNTguMzU5IDEzLjQwNUg1MS44NzJaTTU3LjcyOSAuMjQzSDU5LjU1M0w2Mi44MzQgMTMuNDA1SDYxLjAxWk02NC45NDkgLjI0M0g2Ni43NzJMNjkuNjM3IDExLjczMkg3Mi44MzNMNzMuMjUgMTMuNDA1SDY1LjAzM0w2NC42MTYgMTEuNzMySDY3LjgxM1oiIGZpbGw9IiMwMGE1YjIiLz4NCjxwYXRoIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLC0yMTguNjMwOTIsMTMwLjc3MTQpIiBkPSJNMCAwSDUuMjEzTDcuNzA4IDkuMzExIDEwLjkxMyAxMC41NDYgMTMuOTU3IDBIMTkuODY4TDE1Ljc0MiAxMi40ODFDMTguMjMgMTMuNjQ5IDE5LjQyMyAxNC44ODUgMjEuMTU0IDE3LjgyMiAyMi45MjYgMjAuNzU4IDIzLjU0IDIxLjgyNiAyNC40NDUgMjMuMzYySDE5LjE1QzE4LjM1NCAyMS45MjcgMTcuNzkgMjAuODkyIDE2LjQ5MyAxOC42NTYgMTUuMTI4IDE2LjMyIDE0LjQ1MSAxNS43ODYgMTIuMjMgMTQuODUxTDguODA4IDEzLjQxNiAxMS40NzMgMjMuMzYySDYuMjZaTTQyLjY4OC0uNDY3QzQ5LjIxNS0uNDY3IDUyLjM4NyAxLjU2OCA1My43NzMgNi43NDFMNTYuNDIgMTYuNjJDNTcuODA3IDIxLjc5MyA1NS43MjUgMjMuODI5IDQ5LjE5OCAyMy44MjkgNDIuNjMgMjMuODI5IDM5LjQ1OCAyMS43OTMgMzguMDcxIDE2LjYyTDM1LjQyNCA2Ljc0MUMzNC4wMzkgMS41NjggMzYuMTItLjQ2NyA0Mi42ODgtLjQ2N000MC41OTYgNi43NDEgNDMuMjQzIDE2LjYyQzQzLjk0MSAxOS4yMjMgNDUuMDQyIDE5Ljk1NyA0OC4xNjEgMTkuOTU3IDUxLjIzOSAxOS45NTcgNTEuOTQ2IDE5LjIyMyA1MS4yNDggMTYuNjJMNDguNjAxIDYuNzQxQzQ3LjkwNCA0LjEzOCA0Ni44MDQgMy40MDQgNDMuNzI1IDMuNDA0IDQwLjYwNiAzLjQwNCAzOS44OTkgNC4xMzggNDAuNTk2IDYuNzQxTTYyLjg0NC0uNDY3QzY5LjEyNC0uNDY3IDcyLjA0NyAxLjQwMSA3My4zNyA2LjM0MSA3NC4zOTggMTAuMTc5IDczLjQ5IDEyLjE0NyA2OS4zOTIgMTMuMjQ5TDY1Ljk5IDE0LjE4NEM2My45NjUgMTQuNzUxIDYzLjY4NSAxNS4zODUgNjQuMTg1IDE3LjI1NCA2NC43NTcgMTkuMzkgNjUuNjQzIDIwLjA5MSA2OC4zNTMgMjAuMDkxIDcxLjAyMSAyMC4wOTEgNzEuNTgxIDE5LjQyNCA3MC45NjMgMTcuMTIxTDcwLjc4NSAxNi40NTNINzUuNjY5TDc1Ljg0OSAxNy4xMjFDNzcuMTQ1IDIxLjk2IDc1LjM4OCAyMy44MjkgNjkuMzEzIDIzLjgyOSA2My4yMzcgMjMuODI5IDYwLjQ5NyAyMi4wMjYgNTkuMjE4IDE3LjI1NCA1OC4yMjYgMTMuNTUgNTguOTg4IDExLjY0NiA2Mi44NTcgMTAuNjEzTDY2LjUyOSA5LjYxMkM2OC42MzUgOS4wNDQgNjguOTM5IDguMzQzIDY4LjQwMyA2LjM0MSA2Ny43NzcgNC4wMDUgNjYuODQxIDMuMjcxIDYzLjg4NiAzLjI3MSA2MC45NzIgMy4yNzEgNjAuMjk3IDMuOTcxIDYwLjkyMyA2LjMwOEw2MS4xNzMgNy4yNDJINTYuMjg5TDU2LjAzOCA2LjMwOEM1NC43MjQgMS40MDEgNTYuNjA0LS40NjcgNjIuODQ0LS40NjciIGZpbGw9IiMxZDFkMWIiLz4NCjwvZz4NCjxwYXRoIHRyYW5zZm9ybT0ibWF0cml4KDEsMCwwLC0xLC0xOTUuMjk3NDMsMTE3LjMzMSkiIGQ9Ik0wIDBIOC44NDJMNy43NzEtNC4yOThILTEuMDcyWiIgZmlsbD0iIzFkMWQxYiIvPg0KPC9nPg0KPC9nPg0KPC9nPg0KPC9zdmc+DQo=" alt="K-OS CrossFit">
-    <p>Pega el WOD del día. La app redistribuye todo en la pantalla del TV de una vez.</p>
-    <textarea id="wod-input" placeholder="Pega aquí el WOD del día..."></textarea>
+    <p class="editor-intro">Pega el WOD del día y se reparte solo en la pantalla.</p>
+    <textarea id="wod-input" class="field" aria-label="WOD del día" placeholder="STRENGTH&#10;EMOM 16'&#10;6+6 Bulgarian SQ"></textarea>
     <div class="editor-btns">
-      <button id="btn-show">Mostrar en TV</button>
-      <button id="btn-tv-mode">📺 Modo TV (QR)</button>
-      <button id="btn-fs">⛶ Pantalla completa</button>
-      <button id="btn-cast">📡 Chromecast</button>
-      <button id="btn-share">📋 Copiar URL</button>
+      <button id="btn-show" class="btn btn--primary"><svg class="ico" aria-hidden="true"><use href="#i-eye"/></svg><span>Vista previa</span></button>
+      <button id="btn-tv-mode" class="btn btn--secondary"><svg class="ico" aria-hidden="true"><use href="#i-tv"/></svg><span>Usar como TV</span></button>
+      <button id="btn-cast" class="btn btn--secondary"><svg class="ico" aria-hidden="true"><use href="#i-cast"/></svg><span>Transmitir</span></button>
+      <button id="btn-share" class="btn btn--ghost" hidden><svg class="ico" aria-hidden="true"><use href="#i-copy"/></svg><span>Copiar enlace</span></button>
+      <button id="btn-fs" class="btn btn--ghost"><svg class="ico" aria-hidden="true"><use href="#i-maximize"/></svg><span>Pantalla completa</span></button>
     </div>
   </div>
 
-  <!-- Pantalla 2: Display -->
+  <!-- WOD en pantalla -->
   <div id="screen-display">
-    <div id="display-bg"></div>
+    <div class="kos-bg"></div>
     <div id="tv-frame">
       <div id="wod-header"></div>
       <div id="wod-content">
         <div id="wod-grid"></div>
       </div>
     </div>
-    <button id="btn-back">← Volver</button>
-    <button id="btn-fs-display" onclick="toggleFullscreen()">⛶ Pantalla completa</button>
-    <div id="display-hint">F pantalla completa · C chromecast · Esc volver</div>
+    <div id="display-controls">
+      <button id="btn-back" class="btn btn--glass"><svg class="ico" aria-hidden="true"><use href="#i-arrow-left"/></svg><span id="btn-back-label">Volver</span></button>
+      <button id="btn-fs-display" class="btn btn--glass btn--icon" aria-label="Pantalla completa" onclick="toggleFullscreen()"><svg class="ico" aria-hidden="true"><use href="#i-maximize"/></svg></button>
+    </div>
     <div id="display-corner">
       <img id="display-logo" src="" alt="K-OS CrossFit">
       <div id="wod-clock"><span id="clock-display">--:--</span></div>
     </div>
   </div>
 
-  <!-- Pantalla 3: TV en espera (muestra QR) -->
+  <!-- TV en espera: QR para que el coach envíe el WOD -->
   <div id="screen-tv-wait">
-    <img id="tv-logo" src="" alt="K-OS CrossFit">
-    <img id="tv-qr" src="" alt="QR">
-    <p id="tv-wait-label">Escanea para enviar el WOD</p>
-    <p id="tv-wait-sub">Esperando...</p>
-    <div id="tv-wait-btns">
-      <button id="btn-tv-fs" onclick="toggleFullscreen()">⛶ Pantalla completa</button>
-      <button id="btn-tv-renew">↻ Nuevo QR</button>
+    <div class="kos-bg"></div>
+    <div class="wait-layout">
+      <div class="wait-copy">
+        <img id="tv-logo" src="" alt="K-OS CrossFit">
+        <h1 class="wait-title">Envía el WOD a esta TV</h1>
+        <ol class="wait-steps">
+          <li><span class="step-n">1</span>Escanea el código con el móvil</li>
+          <li><span class="step-n">2</span>Pega el WOD del día</li>
+          <li><span class="step-n">3</span>Pulsa «Enviar a la TV»</li>
+        </ol>
+        <p id="tv-wait-sub" class="live" aria-live="polite"><span class="live-dot"></span><span id="tv-wait-text">Esperando el WOD de hoy</span></p>
+      </div>
+      <div class="qr-card">
+        <img id="tv-qr" src="" alt="Código QR para enviar el WOD a esta TV">
+        <p id="qr-error" hidden>No se pudo generar el código. Comprueba la conexión a internet de la TV.</p>
+      </div>
+    </div>
+    <div class="tv-controls">
+      <button id="btn-tv-fs" class="btn btn--ghost" onclick="toggleFullscreen()"><svg class="ico" aria-hidden="true"><use href="#i-maximize"/></svg><span>Pantalla completa</span></button>
+      <button id="btn-tv-renew" class="btn btn--ghost"><svg class="ico" aria-hidden="true"><use href="#i-refresh"/></svg><span>Nuevo QR</span></button>
     </div>
   </div>
 
-  <!-- Pantalla 4: Enviar WOD desde móvil (tras escanear QR) -->
+  <!-- Móvil: enviar el WOD (tras escanear el QR) -->
   <div id="screen-send">
-    <button id="btn-scan">← Escanear otro QR</button>
-    <img id="send-logo" src="" alt="K-OS CrossFit">
-    <textarea id="send-input" placeholder="Pega el WOD aquí..."></textarea>
-    <button id="btn-send-wod">📺 Enviar al TV</button>
-    <p id="send-status"></p>
+    <header class="send-top">
+      <button id="btn-scan" class="btn btn--ghost"><svg class="ico" aria-hidden="true"><use href="#i-scan"/></svg><span>Cambiar de TV</span></button>
+      <img id="send-logo" src="" alt="K-OS CrossFit">
+    </header>
+    <div id="send-form">
+      <label for="send-input" class="field-label">WOD de hoy</label>
+      <textarea id="send-input" class="field" placeholder="STRENGTH&#10;EMOM 16'&#10;6+6 Bulgarian SQ"></textarea>
+      <button id="btn-send-wod" class="btn btn--primary btn--block btn--lg"><svg class="ico" aria-hidden="true"><use href="#i-tv"/></svg><span>Enviar a la TV</span></button>
+      <p id="send-status" aria-live="polite"></p>
+    </div>
+    <div id="send-empty" hidden>
+      <div class="empty-icon"><svg class="ico" aria-hidden="true"><use href="#i-scan"/></svg></div>
+      <p class="empty-title" id="send-empty-title">Escanea el QR de la TV</p>
+      <p class="empty-text" id="send-empty-text">Así este móvil podrá enviarle el WOD.</p>
+      <button id="btn-scan-empty" class="btn btn--primary btn--block btn--lg"><svg class="ico" aria-hidden="true"><use href="#i-scan"/></svg><span>Escanear QR</span></button>
+    </div>
   </div>
 
   <!-- Escáner QR (móvil) -->
-  <div id="scan-overlay">
-    <video id="scan-video" playsinline muted></video>
+  <div id="scan-overlay" role="dialog" aria-modal="true" aria-label="Escanear el QR de la TV">
+    <div class="scan-frame">
+      <video id="scan-video" playsinline muted></video>
+      <span class="scan-corners"></span>
+    </div>
     <p id="scan-msg">Apunta al QR de la TV</p>
-    <button id="btn-scan-cancel">Cancelar</button>
+    <button id="btn-scan-cancel" class="btn btn--secondary">Cancelar</button>
   </div>
 
-  <!-- Modal: instrucciones Chromecast -->
-  <div id="cast-modal">
-    <div id="cast-panel">
-      <div class="cast-title">Transmitir al TV</div>
+  <!-- Diálogo: generar un QR nuevo -->
+  <div id="renew-dialog" class="dialog" role="dialog" aria-modal="true" aria-labelledby="renew-title">
+    <div class="dialog-panel">
+      <h2 class="dialog-title" id="renew-title">¿Generar un QR nuevo?</h2>
+      <p class="dialog-text">Los móviles que escanearon el actual dejarán de poder enviar el WOD a esta TV.</p>
+      <div class="dialog-actions">
+        <button id="btn-renew-cancel" class="btn btn--secondary">Cancelar</button>
+        <button id="btn-renew-ok" class="btn btn--primary"><svg class="ico" aria-hidden="true"><use href="#i-refresh"/></svg><span>Generar QR nuevo</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diálogo: instrucciones para transmitir -->
+  <div id="cast-modal" class="dialog" role="dialog" aria-modal="true" aria-labelledby="cast-title">
+    <div class="dialog-panel">
+      <h2 class="dialog-title" id="cast-title">Transmitir a la TV</h2>
       <div class="cast-steps" id="cast-steps"></div>
       <div class="cast-note" id="cast-note"></div>
-      <button id="btn-cast-close">Entendido</button>
+      <div class="dialog-actions">
+        <button id="btn-cast-close" class="btn btn--secondary btn--block">Entendido</button>
+      </div>
     </div>
   </div>
 
@@ -505,6 +610,25 @@
     // Mensaje que la TV deja en su canal antiguo al generar un QR nuevo,
     // para que los móviles conectados sepan que ya no sirve.
     const REVOKED = '__kos_qr_revocado__';
+
+    // Pone icono + texto en un botón
+    function setBtn(btn, icon, label) {
+      btn.innerHTML = (icon ? '<svg class="ico" aria-hidden="true"><use href="#i-' + icon + '"/></svg>' : '') +
+        '<span>' + label + '</span>';
+    }
+
+    // Controles flotantes: visibles 5 s tras cualquier interacción
+    let ctrlTimer;
+    function showControls() {
+      document.body.classList.add('show-controls');
+      clearTimeout(ctrlTimer);
+      ctrlTimer = setTimeout(() => document.body.classList.remove('show-controls'), 5000);
+    }
+
+    function setWaitStatus(text, warning) {
+      document.getElementById('tv-wait-text').textContent = text;
+      document.getElementById('tv-wait-sub').classList.toggle('is-warning', !!warning);
+    }
 
     function newCode() {
       const bytes = crypto.getRandomValues(new Uint8Array(9));
@@ -530,17 +654,22 @@
     function startTVMode(renew) {
       tvMode  = true;
       document.body.classList.add('tv');
-      document.getElementById('btn-back').textContent = '← Volver al QR';
+      document.getElementById('btn-back-label').textContent = 'Volver al QR';
       channel = getTVCode(renew);
       history.replaceState(null, '', location.pathname);
       document.getElementById('tv-logo').src = LOGO_LIGHT;
       const sendURL = location.origin + location.pathname + '#send=' + channel;
-      document.getElementById('tv-qr').src =
-        'https://api.qrserver.com/v1/create-qr-code/?size=260x260&color=ffffff&bgcolor=000000&data=' +
+      const qr = document.getElementById('tv-qr');
+      const qrError = document.getElementById('qr-error');
+      qr.hidden = false; qrError.hidden = true;
+      qr.onerror = () => { qr.hidden = true; qrError.hidden = false; };
+      qr.src = 'https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=0&color=1d1d1b&bgcolor=ffffff&data=' +
         encodeURIComponent(sendURL);
       document.getElementById('screen-editor').style.display = 'none';
       document.getElementById('screen-display').style.display = 'none';
       document.getElementById('screen-tv-wait').style.display = 'flex';
+      setWaitStatus('Esperando el WOD de hoy');
+      showControls();
       // Recupera el último WOD enviado hoy (ntfy guarda los mensajes ~12 h),
       // así un reinicio de la TV no obliga a reenviarlo.
       const midnight = Math.floor(new Date().setHours(0, 0, 0, 0) / 1000);
@@ -552,6 +681,23 @@
           if (m && m !== REVOKED) showTVWOD(m);
         } catch (err) {}
       });
+      tvSource.onopen  = () => setWaitStatus('Esperando el WOD de hoy');
+      tvSource.onerror = () => setWaitStatus('Reconectando…', true);
+    }
+
+    function showSendEmpty(title, text, cta) {
+      document.getElementById('send-form').hidden = true;
+      document.getElementById('send-empty').hidden = false;
+      document.getElementById('send-empty-title').textContent = title;
+      document.getElementById('send-empty-text').textContent = text;
+      setBtn(document.getElementById('btn-scan-empty'), 'scan', cta);
+    }
+
+    function setSendStatus(text, kind) {
+      const status = document.getElementById('send-status');
+      status.textContent = text;
+      status.classList.toggle('ok', kind === 'ok');
+      status.classList.toggle('error', kind === 'error');
     }
 
     function startSendMode(code) {
@@ -559,14 +705,8 @@
       document.getElementById('send-logo').src = LOGO_LIGHT;
       document.getElementById('screen-editor').style.display = 'none';
       document.getElementById('screen-send').style.display = 'flex';
-      const btn = document.getElementById('btn-send-wod');
-      const status = document.getElementById('send-status');
       if (!channel) {
-        btn.style.display = 'none';
-        status.textContent = 'Escanea el QR que aparece en la TV.';
-        const scan = document.getElementById('btn-scan');
-        scan.classList.add('big');
-        scan.textContent = '📷 Escanear QR';
+        showSendEmpty('Escanea el QR de la TV', 'Así este móvil podrá enviarle el WOD.', 'Escanear QR');
         return;
       }
       // Escucha el canal por si la TV genera un QR nuevo (ntfy guarda ~12 h)
@@ -574,39 +714,43 @@
       es.addEventListener('message', e => {
         try { if (JSON.parse(e.data).message === REVOKED) { es.close(); markRevoked(); } } catch (err) {}
       });
+      const btn = document.getElementById('btn-send-wod');
       btn.addEventListener('click', () => {
-        const raw = document.getElementById('send-input').value;
-        if (!raw.trim()) return;
-        btn.disabled = true;
-        status.textContent = 'Enviando…';
-        sendToTV(raw).then(() => {
-          btn.textContent = '✓ WOD enviado';
-          btn.style.background = '#4caf50'; btn.style.color = '#fff';
-          status.textContent = 'El WOD ya está en la TV.';
+        const input = document.getElementById('send-input');
+        if (!input.value.trim()) {
+          setSendStatus('Pega primero el WOD.', 'error');
+          input.focus();
+          return;
+        }
+        if (btn.getAttribute('aria-busy') === 'true') return;
+        btn.setAttribute('aria-busy', 'true');
+        setBtn(btn, 'send', 'Enviando…');
+        setSendStatus('');
+        sendToTV(input.value).then(() => {
+          btn.classList.add('is-sent');
+          setBtn(btn, 'check', 'Enviado a la TV');
+          setSendStatus('Ya está en la pantalla. Si lo cambias, vuelve a enviarlo.', 'ok');
         }).catch(() => {
-          status.textContent = 'No se pudo enviar. Revisa la conexión e inténtalo de nuevo.';
-        }).finally(() => { btn.disabled = false; });
+          setBtn(btn, 'send', 'Reintentar');
+          setSendStatus('No se ha podido enviar. Revisa la conexión y vuelve a intentarlo.', 'error');
+        }).finally(() => btn.removeAttribute('aria-busy'));
       });
     }
 
     function markRevoked() {
       channel = null;
-      document.getElementById('btn-send-wod').style.display = 'none';
-      const status = document.getElementById('send-status');
-      status.classList.add('error');
-      status.textContent = 'Este QR ya no es válido: en la TV se ha generado uno nuevo.';
-      const scan = document.getElementById('btn-scan');
-      scan.classList.add('big');
-      scan.textContent = '📷 Escanear el QR nuevo';
+      showSendEmpty('Este QR ya no sirve',
+        'En la TV se ha generado uno nuevo. Escanéalo para seguir enviando el WOD.',
+        'Escanear el QR nuevo');
     }
 
     // Si se edita el texto tras enviar, el botón vuelve a "Enviar"
     function resetSendButton() {
       if (!channel) return;
       const btn = document.getElementById('btn-send-wod');
-      btn.textContent = '📺 Enviar al TV';
-      btn.style.background = ''; btn.style.color = '';
-      document.getElementById('send-status').textContent = '';
+      btn.classList.remove('is-sent');
+      setBtn(btn, 'tv', 'Enviar a la TV');
+      setSendStatus('');
     }
 
     /* ─── Escáner QR en el móvil ───
@@ -614,6 +758,7 @@
     const JSQR_URL = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
     const JSQR_SRI = 'sha384-b5Ya4Bq3qCyz39m2ISh+4DxjAIljdeFwK/BsXLuj9gugaNwAcj/ia15fxNZL9Nlx';
     let scanStream = null;
+    let msgTimer = null;
 
     function loadJsQR() {
       if (window.jsQR) return Promise.resolve();
@@ -628,12 +773,15 @@
     async function openScanner() {
       const msg   = document.getElementById('scan-msg');
       const video = document.getElementById('scan-video');
-      document.getElementById('scan-overlay').style.display = 'flex';
+      const overlay = document.getElementById('scan-overlay');
+      overlay.style.display = 'flex';
+      overlay.classList.remove('no-camera');
       msg.textContent = 'Apunta al QR de la TV';
       try {
         await loadJsQR();
         scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
       } catch (e) {
+        overlay.classList.add('no-camera');
         msg.textContent = 'No se pudo abrir la cámara. Escanea el QR con la app de cámara del móvil.';
         return;
       }
@@ -650,12 +798,16 @@
           const qr = jsQR(img.data, img.width, img.height);  // el QR de la TV es blanco sobre negro: jsQR prueba ambos
           const m = qr && qr.data.match(/#send=([0-9a-f]+)/);
           if (m) {
+            if (navigator.vibrate) navigator.vibrate(30);
             closeScanner();
             location.replace(location.pathname + '#send=' + m[1]);
             location.reload();
             return;
           }
-          if (qr) msg.textContent = 'Ese QR no es de una TV K-OS.';
+          if (qr && !msgTimer) {
+            msg.textContent = 'Ese QR no es de una TV K-OS.';
+            msgTimer = setTimeout(() => { msg.textContent = 'Apunta al QR de la TV'; msgTimer = null; }, 2500);
+          }
         }
         requestAnimationFrame(tick);
       };
@@ -669,22 +821,15 @@
       document.getElementById('scan-overlay').style.display = 'none';
     }
 
-    /* ─── TV: mostrar "Volver al QR" con cualquier interacción ─── */
-    let ctrlTimer;
-    function showTVControls() {
-      if (!tvMode) return;
-      document.body.classList.add('show-controls');
-      clearTimeout(ctrlTimer);
-      ctrlTimer = setTimeout(() => document.body.classList.remove('show-controls'), 5000);
-    }
-
     function showTVWOD(raw) {
       document.getElementById('screen-tv-wait').style.display = 'none';
       renderWOD(raw);
       document.getElementById('display-logo').src = LOGO_LIGHT;
       document.getElementById('screen-display').style.display = 'flex';
       startClock();
+      showControls();
       setTimeout(scaleWOD, 100);
+      document.fonts.ready.then(scaleWOD);
     }
 
     /* ─── Codificación WOD en URL ─── */
@@ -992,8 +1137,10 @@
       document.getElementById('screen-display').style.display = 'flex';
       startClock();
 
-      // Escalar después de que el layout esté listo
+      showControls();
+      // Escalar después de que el layout y la fuente estén listos
       setTimeout(scaleWOD, 100);
+      document.fonts.ready.then(scaleWOD);
 
       if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen()
@@ -1010,6 +1157,7 @@
       if (tvMode) {
         history.replaceState(null, '', location.pathname);
         document.getElementById('screen-tv-wait').style.display = 'flex';
+        showControls();
       } else {
         history.replaceState(null, '', '#editor');
         document.getElementById('screen-editor').style.display  = 'flex';
@@ -1031,12 +1179,13 @@
     /* ─── Compartir URL (solo en HTTP) ─── */
     if (location.protocol === 'http:' || location.protocol === 'https:') {
       const btnShare = document.getElementById('btn-share');
-      btnShare.style.display = '';
+      btnShare.hidden = false;
       btnShare.addEventListener('click', () => {
-        navigator.clipboard.writeText(location.href).then(() => {
-          const orig = btnShare.textContent;
-          btnShare.textContent = '✓ Copiado';
-          setTimeout(() => { btnShare.textContent = orig; }, 2000);
+        const raw = document.getElementById('wod-input').value;
+        const url = raw.trim() ? wodURL(raw) : location.href;
+        navigator.clipboard.writeText(url).then(() => {
+          setBtn(btnShare, 'check', 'Enlace copiado');
+          setTimeout(() => setBtn(btnShare, 'copy', 'Copiar enlace'), 2000);
         });
       });
     }
@@ -1055,14 +1204,14 @@
 
       const shareBox = `
         <div class="cast-share-box">
-          <div class="cast-share-label">Enviar WOD a la Samsung TV</div>
-          <button id="btn-share-wod" onclick="shareWODLink()">📤 Compartir enlace del WOD</button>
-          <div class="cast-share-sub">Mándatelo por WhatsApp → ábrelo en la Samsung TV desde WhatsApp Web → el WOD aparece solo en la TV, el móvil queda libre</div>
+          <div class="cast-share-label">Abrir el WOD en la TV con un enlace</div>
+          <button id="btn-share-wod" class="btn btn--primary btn--block" onclick="shareWODLink()"><svg class="ico" aria-hidden="true"><use href="#i-share"/></svg><span>Compartir enlace del WOD</span></button>
+          <div class="cast-share-sub">Mándatelo por WhatsApp y ábrelo en el navegador de la TV: el WOD aparece solo y el móvil queda libre.</div>
         </div>`;
 
       if (isIOS) {
         stepsEl.innerHTML = shareBox +
-          castStep(1, '<strong>AirPlay (alternativa)</strong>: gira el móvil a horizontal → Centro de Control → "Duplicar pantalla" → elige tu Samsung TV. El móvil debe quedarse en la app.') +
+          castStep(1, '<strong>AirPlay (alternativa)</strong>: gira el móvil a horizontal → Centro de Control → "Duplicar pantalla" → elige tu TV. El móvil debe quedarse en la app.') +
           castStep(2, '<strong>Cable HDMI</strong>: adaptador Lightning o USB-C a HDMI.');
         noteEl.innerHTML = '';
       } else {
@@ -1077,10 +1226,20 @@
 
     function openCastModal() {
       buildCastInstructions();
-      document.getElementById('cast-modal').style.display = 'flex';
+      document.getElementById('cast-modal').classList.add('is-open');
+      document.getElementById('btn-cast-close').focus({ preventScroll: true });
     }
     function closeCastModal() {
-      document.getElementById('cast-modal').style.display = 'none';
+      document.getElementById('cast-modal').classList.remove('is-open');
+    }
+
+    function openRenewDialog() {
+      document.getElementById('renew-dialog').classList.add('is-open');
+      document.getElementById('btn-renew-cancel').focus();   // el foco va a la opción segura
+    }
+    function closeRenewDialog() {
+      document.getElementById('renew-dialog').classList.remove('is-open');
+      document.getElementById('btn-tv-renew').focus();
     }
 
     function startCast() {
@@ -1101,17 +1260,22 @@
     /* ─── Eventos ─── */
     document.getElementById('btn-show').addEventListener('click', showDisplay);
     document.getElementById('btn-tv-mode').addEventListener('click', () => startTVMode());
-    document.getElementById('btn-tv-renew').addEventListener('click', () => {
-      if (confirm('¿Generar un QR nuevo? Los móviles que escanearon el anterior dejarán de poder enviar.')) {
-        fetch(NTFY_BASE + channel, { method: 'POST', body: REVOKED }).catch(() => {});
-        startTVMode(true);
-      }
+    document.getElementById('btn-tv-renew').addEventListener('click', openRenewDialog);
+    document.getElementById('btn-renew-cancel').addEventListener('click', closeRenewDialog);
+    document.getElementById('btn-renew-ok').addEventListener('click', () => {
+      fetch(NTFY_BASE + channel, { method: 'POST', body: REVOKED }).catch(() => {});
+      document.getElementById('renew-dialog').classList.remove('is-open');
+      startTVMode(true);
     });
+    document.getElementById('renew-dialog').addEventListener('click', e => {
+      if (e.target === e.currentTarget) closeRenewDialog();
+    });
+    document.getElementById('btn-scan-empty').addEventListener('click', openScanner);
     document.getElementById('send-input').addEventListener('input', resetSendButton);
     document.getElementById('btn-scan').addEventListener('click', openScanner);
     document.getElementById('btn-scan-cancel').addEventListener('click', closeScanner);
     ['mousemove', 'touchstart', 'keydown'].forEach(ev =>
-      document.addEventListener(ev, showTVControls, { passive: true }));
+      document.addEventListener(ev, showControls, { passive: true }));
     document.getElementById('btn-cast').addEventListener('click', startCast);
     document.getElementById('btn-cast-close').addEventListener('click', closeCastModal);
     document.getElementById('cast-modal').addEventListener('click', e => {
@@ -1133,15 +1297,16 @@
     document.getElementById('btn-fs').addEventListener('click', toggleFullscreen);
 
     document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        if (document.getElementById('renew-dialog').classList.contains('is-open')) { closeRenewDialog(); return; }
+        if (document.getElementById('cast-modal').classList.contains('is-open'))   { closeCastModal();  return; }
+      }
       const onDisplay = document.getElementById('screen-display').style.display !== 'none';
       if (!onDisplay) return;
       if (e.key === 'f' || e.key === 'F') toggleFullscreen();
       else if (e.key === 'c' || e.key === 'C') openCastModal();
       else if (e.key === 'Backspace' && tvMode) goBack();
-      else if (e.key === 'Escape') {
-        if (document.getElementById('cast-modal').style.display !== 'none') closeCastModal();
-        else if (!document.fullscreenElement) goBack();
-      }
+      else if (e.key === 'Escape' && !document.fullscreenElement) goBack();
     });
 
     document.addEventListener('fullscreenchange', () => {
@@ -1150,10 +1315,6 @@
       }
       const inFS = !!document.fullscreenElement;
       document.body.classList.toggle('fs', inFS);
-      const fsDisplay = document.getElementById('btn-fs-display');
-      const fsTv = document.getElementById('btn-tv-fs');
-      if (fsDisplay) fsDisplay.style.display = inFS ? 'none' : '';
-      if (fsTv) fsTv.style.display = inFS ? 'none' : '';
       setTimeout(scaleWOD, 200);
     });
 
@@ -1167,9 +1328,8 @@
         navigator.clipboard.writeText(url).then(() => {
           const btn = document.getElementById('btn-share-wod');
           if (!btn) return;
-          const orig = btn.textContent;
-          btn.textContent = '✓ Enlace copiado';
-          setTimeout(() => { btn.textContent = orig; }, 2500);
+          setBtn(btn, 'check', 'Enlace copiado');
+          setTimeout(() => setBtn(btn, 'share', 'Compartir enlace del WOD'), 2500);
         }).catch(() => {});
       }
     }
